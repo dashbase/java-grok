@@ -181,7 +181,7 @@ public class Match {
     // _capture.put("LINE", this.line);
     // _capture.put("LENGTH", this.line.length() +"");
 
-    Map<String, String> mappedw = GrokUtils.namedGroups(this.match,this.subject);
+    Map<String, String> mappedw = GrokUtils.namedGroups(this.match, this.grok.namedGroups);
     Iterator<Entry<String, String>> it = mappedw.entrySet().iterator();
     while (it.hasNext()) {
 
