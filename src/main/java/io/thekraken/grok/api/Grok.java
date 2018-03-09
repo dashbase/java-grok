@@ -106,8 +106,8 @@ public class Grok implements Serializable {
     disco = null;
     namedRegex = StringUtils.EMPTY;
     compiledNamedRegex = null;
-    grokPatternDefinition = new TreeMap<String, String>();
-    namedRegexCollection = new TreeMap<String, String>();
+    grokPatternDefinition = new HashMap<>();
+    namedRegexCollection = new HashMap<>();
     savedPattern = StringUtils.EMPTY;
   }
 
@@ -185,7 +185,7 @@ public class Grok implements Serializable {
       throw new GrokException("Invalid Patterns");
     }
     for (Map.Entry<String, String> entry : cpy.entrySet()) {
-      grokPatternDefinition.put(entry.getKey().toString(), entry.getValue().toString());
+      grokPatternDefinition.put(entry.getKey(), entry.getValue());
     }
   }
 
@@ -373,12 +373,13 @@ public class Grok implements Serializable {
       }
       iterationLeft--;
 
+      Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
       Matcher m = GrokUtils.GROK_PATTERN.matcher(namedRegex);
       // Match %{Foo:bar} -> pattern name and subname
       // Match %{Foo=regex} -> add new regex definition 
       if (m.find()) {
         continueIteration = true;
-        Map<String, String> group = GrokUtils.namedGroups(m, GrokUtils.getNameGroups(m.group()));
+        Map<String, String> group = GrokUtils.namedGroups(m, namedGroups);
         if (group.get("definition") != null) {
           try {
             addPattern(group.get("pattern"), group.get("definition"));
