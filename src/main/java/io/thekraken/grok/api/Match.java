@@ -190,10 +190,14 @@ public class Match {
         key = id;
       }
 
+      if ("UNWANTED".equals(key)) {
+        return;
+      }
+
       Object value = valueString;
-      if (valueString != null) {
-        if (automaticConversionEnabled) {
-          KeyValue keyValue = Converter.convert(key, value);
+      if (valueString != null && automaticConversionEnabled) {
+        if (Converter.DELIMITER.matchesAnyOf(key)) {
+          KeyValue keyValue = Converter.convert(key, valueString);
 
           // get validated key
           key = keyValue.getKey();
@@ -209,6 +213,8 @@ public class Match {
           if (keyValue.hasGrokFailure()) {
             capture.put(key + "_grokfailure", keyValue.getGrokFailure());
           }
+        } else {
+          value = cleanString(valueString);
         }
       }
 
@@ -317,7 +323,7 @@ public class Match {
   }
 
   /**
-   * Remove and rename the unwanted elelents in the matched map.
+   * Remove and rename the unwanted elements in the matched map.
    */
   private void cleanMap() {
     garbage.rename(capture);

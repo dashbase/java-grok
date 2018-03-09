@@ -18,7 +18,9 @@ public class Converter {
 
   public static Locale locale = Locale.ENGLISH;
 
-  private static final Splitter SPLITTER = Splitter.on(CharMatcher.anyOf(";:")).limit(3);
+  public static final CharMatcher DELIMITER = CharMatcher.anyOf(";:");
+
+  private static final Splitter SPLITTER = Splitter.on(DELIMITER).limit(3);
 
   private static Map<String, IConverter<?>> CONVERTERS = ImmutableMap.<String, IConverter<?>>builder()
       .put("byte", new ByteConverter())
@@ -41,16 +43,16 @@ public class Converter {
     return converter;
   }
 
-  public static KeyValue convert(String key, Object value) {
+  public static KeyValue convert(String key, String value) {
     List<String> spec = SPLITTER.splitToList(key);
     try {
       switch (spec.size()) {
         case 1:
           return new KeyValue(spec.get(0), value);
         case 2:
-          return new KeyValue(spec.get(0), getConverter(spec.get(1)).convert(String.valueOf(value)));
+          return new KeyValue(spec.get(0), getConverter(spec.get(1)).convert(value));
         case 3:
-          return new KeyValue(spec.get(0), getConverter(spec.get(1)).convert(String.valueOf(value), spec.get(2)));
+          return new KeyValue(spec.get(0), getConverter(spec.get(1)).convert(value, spec.get(2)));
         default:
           return new KeyValue(spec.get(0), value, "Unsupported spec :" + key);
       }
