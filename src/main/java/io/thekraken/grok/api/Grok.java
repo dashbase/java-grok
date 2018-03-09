@@ -17,18 +17,15 @@ package io.thekraken.grok.api;
 
 import static java.lang.String.format;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Serializable;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+import com.google.common.io.Resources;
 import io.thekraken.grok.api.exception.GrokException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -53,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @since 0.0.1
  * @author anthonycorbacho
  */
-public class Grok implements Serializable {
+public class Grok {
 
   private static final Logger LOG = LoggerFactory.getLogger(Grok.class);
   /**
@@ -215,18 +212,10 @@ public class Grok implements Serializable {
    */
   public void addPatternFromFile(String file) throws GrokException {
 
-    File f = new File(file);
-    if (!f.exists()) {
-      throw new GrokException("Pattern not found");
-    }
-
-    if (!f.canRead()) {
-      throw new GrokException("Pattern cannot be read");
-    }
-
-    FileReader r = null;
+    URL patternFile = Resources.getResource(file);
+    Reader r = null;
     try {
-      r = new FileReader(f);
+      r = new InputStreamReader(patternFile.openStream(), StandardCharsets.UTF_8);
       addPatternFromReader(r);
     } catch (FileNotFoundException e) {
       throw new GrokException(e.getMessage());
