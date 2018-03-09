@@ -177,6 +177,8 @@ public class Match {
     if (match == null) {
       return;
     }
+
+    capture.clear();
     boolean automaticConversionEnabled = grok.isAutomaticConversionEnabled();
 
     // _capture.put("LINE", this.line);

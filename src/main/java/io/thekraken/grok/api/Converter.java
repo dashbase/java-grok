@@ -10,7 +10,7 @@ import java.util.*;
 
 /**
  * Convert String argument to the right type.
- * 
+ *
  * @author anthonyc
  *
  */
