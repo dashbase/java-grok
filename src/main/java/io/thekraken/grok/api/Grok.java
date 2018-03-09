@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import io.thekraken.grok.api.exception.GrokException;
 import org.apache.commons.lang3.StringUtils;
@@ -212,14 +213,16 @@ public class Grok {
    */
   public void addPatternFromFile(String file) throws GrokException {
 
-    URL patternFile = Resources.getResource(file);
     Reader r = null;
     try {
-      r = new InputStreamReader(patternFile.openStream(), StandardCharsets.UTF_8);
+      try {
+        URL patternFile = Resources.getResource(file);
+        r = new InputStreamReader(patternFile.openStream(), StandardCharsets.UTF_8);
+      } catch (IllegalArgumentException e) {
+        r = Files.newReader(new File(file), StandardCharsets.UTF_8);
+      }
       addPatternFromReader(r);
-    } catch (FileNotFoundException e) {
-      throw new GrokException(e.getMessage());
-    } catch (@SuppressWarnings("hiding") IOException e) {
+    } catch (IllegalArgumentException|IOException e) {
       throw new GrokException(e.getMessage());
     } finally {
       try {
