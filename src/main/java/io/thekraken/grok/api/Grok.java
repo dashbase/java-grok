@@ -15,7 +15,12 @@
  *******************************************************************************/
 package io.thekraken.grok.api;
 
-import static java.lang.String.format;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
+import io.thekraken.grok.api.exception.GrokException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
@@ -24,13 +29,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-import com.google.common.io.Files;
-import com.google.common.io.Resources;
-import io.thekraken.grok.api.exception.GrokException;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.String.format;
 
 
 /**
