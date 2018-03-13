@@ -91,6 +91,8 @@ public class Grok {
    */
   private boolean automaticConversionEnabled = true;
 
+  public Map<String, IConverter> converters;
+
   /**
    * Create Empty {@code Grok}.
    */
@@ -352,11 +354,11 @@ public class Grok {
     namedRegex = pattern;
     originalGrokPattern = pattern;
     int index = 0;
-    /** flag for infinite recurtion */
+    /** flag for infinite recursion */
     int iterationLeft = 1000;
     Boolean continueIteration = true;
 
-    // Replace %{foo} with the regex (mostly groupname regex)
+    // Replace %{foo} with the regex (mostly group name regex)
     // and then compile the regex
     while (continueIteration) {
       continueIteration = false;
@@ -407,6 +409,8 @@ public class Grok {
     // Compile the regex
     compiledNamedRegex = Pattern.compile(namedRegex);
     namedGroups = GrokUtils.getNameGroups(namedRegex);
+
+    converters = Converter.getConverters(namedRegexCollection.values());
   }
 
   /**
