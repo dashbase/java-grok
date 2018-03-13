@@ -20,7 +20,6 @@ public class TestPerformance {
       Match match = grok.match(input);
       match.captures();
       Map<String, Object> map = match.toMap();
-      //System.out.println(map.get("timestamp"));
     }
     long end = System.currentTimeMillis();
     System.out.println("took: " + (end-start) + " millis");
