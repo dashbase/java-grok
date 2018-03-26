@@ -1,7 +1,9 @@
 package io.thekraken.grok.api;
 
+import org.joni.Matcher;
 import org.joni.NameEntry;
 import org.joni.Regex;
+import org.joni.Region;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -43,12 +45,23 @@ public class GrokUtils {
     return namedGroups;
   }
 
-  public static Map<String, String> namedGroups(Matcher matcher, Set<String> groupNames) {
+  public static Map<String, String> namedGroups(byte[] bytes, Matcher matcher, Regex regex) {
     Map<String, String> namedGroups = new LinkedHashMap<String, String>();
-    for (String groupName : groupNames) {
-      String groupValue = matcher.group(groupName);
-      namedGroups.put(groupName, groupValue);
-    }
+
+      Region region = matcher.getEagerRegion();
+      for (Iterator<NameEntry> entry = regex.namedBackrefIterator(); entry.hasNext();) {
+          NameEntry e = entry.next();
+          int number = e.getBackRefs()[0];
+          int begin = region.beg[number];
+          int end = region.end[number];
+
+          if (begin >= 0 && end > begin) {
+              String groupName = new String(e.name, e.nameP, e.nameEnd - e.nameP, StandardCharsets.UTF_8);
+              String groupValue = new String(bytes, begin, end - begin, StandardCharsets.UTF_8);
+              namedGroups.put(groupName, groupValue);
+          }
+      }
+
     return namedGroups;
   }
 }

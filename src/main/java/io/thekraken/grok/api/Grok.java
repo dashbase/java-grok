@@ -16,15 +16,16 @@
 package io.thekraken.grok.api;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joni.Matcher;
+import org.joni.Option;
+import org.joni.Regex;
 
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -62,7 +63,7 @@ public class Grok {
   /**
    * Pattern of the namedRegex.
    */
-  private final Pattern compiledNamedRegex;
+  private final Regex compiledNamedRegex;
 
   /**
    * {@code Grok} patterns definition.
@@ -90,7 +91,7 @@ public class Grok {
               ZoneId defaultTimeZone) {
     this.originalGrokPattern = pattern;
     this.namedRegex = namedRegex;
-    this.compiledNamedRegex = Pattern.compile(namedRegex);
+    this.compiledNamedRegex = new Regex(namedRegex);
     this.namedRegexCollection = namedRegexCollection;
     this.namedGroups = GrokUtils.getNameGroups(namedRegex);
     this.groupTypes = Converter.getGroupTypes(namedRegexCollection.values());
@@ -193,11 +194,10 @@ public class Grok {
       return Match.EMPTY;
     }
 
-    Matcher m = compiledNamedRegex.matcher(text);
-    if (m.find()) {
-      return new Match(
-          text, this, m, m.start(0), m.end(0)
-      );
+    byte[] bytes = text.toString().getBytes(StandardCharsets.UTF_8);
+    Matcher m = compiledNamedRegex.matcher(bytes, 0, bytes.length);
+    if (m.search(0, bytes.length, Option.DEFAULT) != -1) {
+      return new Match(bytes, this, m);
     }
 
     return Match.EMPTY;
@@ -216,5 +216,9 @@ public class Grok {
       disco = new Discovery(this);
     }
     return disco.discover(input);
+  }
+
+  Regex getCompiledNamedRegex() {
+    return compiledNamedRegex;
   }
 }

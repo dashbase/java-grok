@@ -190,6 +190,7 @@ public class Discovery {
       return "";
     }
 
-    return text.substring(m.getStart(), m.getEnd());
+    return text;
+//    return text.substring(m.getStart(), m.getEnd());
   }
 }

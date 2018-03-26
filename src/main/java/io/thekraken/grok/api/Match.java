@@ -19,12 +19,12 @@ package io.thekraken.grok.api;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.joni.Matcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 import static java.lang.String.format;
 
@@ -40,40 +40,28 @@ public class Match {
           new GsonBuilder().setPrettyPrinting().create();
   private static final Gson GSON = new GsonBuilder().create();
 
-  private final CharSequence subject; // texte
+  private final byte[] subject; // texte
   private final Grok grok;
   private final Matcher match;
-  private final int start;
-  private final int end;
 
   private Map<String, Object> capture = Collections.emptyMap();
 
   /**
    * Create a new {@code Match} object.
    */
-  public Match(CharSequence subject, Grok grok, Matcher match, int start, int end) {
+  public Match(byte[] subject, Grok grok, Matcher match) {
     this.subject = subject;
     this.grok = grok;
     this.match = match;
-    this.start = start;
-    this.end = end;
   }
 
   /**
    * Create Empty grok matcher.
    */
-  public static final Match EMPTY = new Match("", null, null, 0, 0);
+  public static final Match EMPTY = new Match(new byte[0], null, null);
 
   public Matcher getMatch() {
     return match;
-  }
-
-  public int getStart() {
-    return start;
-  }
-
-  public int getEnd() {
-    return end;
   }
 
   /**
@@ -81,7 +69,7 @@ public class Match {
    *
    * @return the single line of log
    */
-  public CharSequence getSubject() {
+  public byte[] getSubject() {
     return subject;
   }
 
@@ -125,7 +113,7 @@ public class Match {
     // _capture.put("LINE", this.line);
     // _capture.put("LENGTH", this.line.length() +"");
 
-    Map<String, String> mappedw = GrokUtils.namedGroups(this.match, this.grok.namedGroups);
+    Map<String, String> mappedw = GrokUtils.namedGroups(subject, this.match, this.grok.getCompiledNamedRegex());
 
     mappedw.forEach((key, valueString) -> {
       String id = this.grok.getNamedRegexCollectionById(key);

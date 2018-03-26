@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Map;
-import java.util.Set;
 
 import static java.lang.String.format;
 
@@ -77,8 +76,8 @@ public class GrokCompiler {
          Matcher matcher = pattern.matcher(bytes);
          if (matcher.match(0, bytes.length, Option.DEFAULT) != -1) {
            Region region = matcher.getEagerRegion();
-           String name = new String(bytes, region.beg[0], region.end[0], StandardCharsets.UTF_8);
-           String pat = new String(bytes, region.beg[1], region.end[1], StandardCharsets.UTF_8);
+           String name = new String(bytes, region.beg[1], region.end[1] - region.beg[1], StandardCharsets.UTF_8);
+           String pat = new String(bytes, region.beg[2], region.end[2] - region.beg[2], StandardCharsets.UTF_8);
            register(name, pat);
          }
       });
@@ -128,13 +127,14 @@ public class GrokCompiler {
       }
       iterationLeft--;
 
-      Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN);
-      Matcher m = new Regex(GrokUtils.GROK_PATTERN).matcher(namedRegex);
+      Regex regex = new Regex(GrokUtils.GROK_PATTERN);
+      byte[] bytes = namedRegex.getBytes(StandardCharsets.UTF_8);
+      Matcher m = new Regex(GrokUtils.GROK_PATTERN).matcher(bytes);
       // Match %{Foo:bar} -> pattern name and subname
       // Match %{Foo=regex} -> add new regex definition
-      if (m.find()) {
+      if (m.search(0, bytes.length, Option.DEFAULT) != -1) {
         continueIteration = true;
-        Map<String, String> group = GrokUtils.namedGroups(m, namedGroups);
+        Map<String, String> group = GrokUtils.namedGroups(bytes, m, regex);
         if (group.get("definition") != null) {
           patternDefinitions.put(group.get("pattern"), group.get("definition"));
           group.put("name", group.get("name") + "=" + group.get("definition"));
