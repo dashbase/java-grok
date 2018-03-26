@@ -1,8 +1,10 @@
 package io.thekraken.grok.api;
 
+import org.joni.NameEntry;
+import org.joni.Regex;
+
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -16,7 +18,7 @@ public class GrokUtils {
   /**
    * Extract Grok patter like %{FOO} to FOO, Also Grok pattern with semantic.
    */
-  public static final Pattern GROK_PATTERN = Pattern.compile(
+  public static final String GROK_PATTERN =
       "%\\{" +
       "(?<name>" +
         "(?<pattern>[A-z0-9]+)" +
@@ -28,16 +30,15 @@ public class GrokUtils {
             ")+" +
             ")" +
       ")?" +
-      "\\}");
+      "\\}";
   
-  public static final Pattern NAMED_REGEX = Pattern
-      .compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>");
-
   public static Set<String> getNameGroups(String regex) {
     Set<String> namedGroups = new LinkedHashSet<>();
-    Matcher m = NAMED_REGEX.matcher(regex);
-    while (m.find()) {
-      namedGroups.add(m.group(1));
+    Regex compiled = new Regex(regex);
+    Iterator<NameEntry> it = compiled.namedBackrefIterator();
+    while (it.hasNext()) {
+      NameEntry ne = it.next();
+      namedGroups.add(new String(ne.name, ne.nameP, ne.nameEnd - ne.nameP, StandardCharsets.UTF_8));
     }
     return namedGroups;
   }

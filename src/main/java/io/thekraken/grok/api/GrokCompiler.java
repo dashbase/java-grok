@@ -4,6 +4,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import io.thekraken.grok.api.exception.GrokException;
 import org.apache.commons.lang3.StringUtils;
+import org.joni.Matcher;
+import org.joni.Option;
+import org.joni.Regex;
+import org.joni.Region;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,8 +18,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 
@@ -64,16 +66,22 @@ public class GrokCompiler {
    */
   public void register(InputStream input) throws IOException {
     // We don't want \n and commented line
-    Pattern pattern = Pattern.compile("^([A-z0-9_]+)\\s+(.*)$");
+    Regex pattern = new Regex("^([A-z0-9_]+)\\s+(.*)$");
 
     try (
         BufferedReader in =
             new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))
     ) {
-      in.lines()
-        .map(l -> pattern.matcher(l))
-        .filter(Matcher::matches)
-        .forEach(m -> register(m.group(1), m.group(2)));
+      in.lines().forEach(l -> {
+        byte[] bytes = l.getBytes(StandardCharsets.UTF_8);
+         Matcher matcher = pattern.matcher(bytes);
+         if (matcher.match(0, bytes.length, Option.DEFAULT) != -1) {
+           Region region = matcher.getEagerRegion();
+           String name = new String(bytes, region.beg[0], region.end[0], StandardCharsets.UTF_8);
+           String pat = new String(bytes, region.beg[1], region.end[1], StandardCharsets.UTF_8);
+           register(name, pat);
+         }
+      });
     }
   }
 
@@ -120,8 +128,8 @@ public class GrokCompiler {
       }
       iterationLeft--;
 
-      Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
-      Matcher m = GrokUtils.GROK_PATTERN.matcher(namedRegex);
+      Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN);
+      Matcher m = new Regex(GrokUtils.GROK_PATTERN).matcher(namedRegex);
       // Match %{Foo:bar} -> pattern name and subname
       // Match %{Foo=regex} -> add new regex definition
       if (m.find()) {
