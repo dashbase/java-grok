@@ -34,33 +34,33 @@ public class GrokUtils {
       ")?" +
       "\\}";
   
-  public static Set<String> getNameGroups(String regex) {
-    Set<String> namedGroups = new LinkedHashSet<>();
+  public static Map<String, Integer> getNameGroups(String regex) {
+    Map<String, Integer> namedGroups = new LinkedHashMap<>();
     Regex compiled = new Regex(regex);
+    if (compiled.numberOfNames() == 0) {
+        return Collections.emptyMap();
+    }
+
     Iterator<NameEntry> it = compiled.namedBackrefIterator();
     while (it.hasNext()) {
       NameEntry ne = it.next();
-      namedGroups.add(new String(ne.name, ne.nameP, ne.nameEnd - ne.nameP, StandardCharsets.UTF_8));
+      namedGroups.put(new String(ne.name, ne.nameP, ne.nameEnd - ne.nameP, StandardCharsets.UTF_8), ne.getBackRefs()[0]);
     }
     return namedGroups;
   }
 
-  public static Map<String, String> namedGroups(byte[] bytes, Matcher matcher, Regex regex) {
-    Map<String, String> namedGroups = new LinkedHashMap<String, String>();
+  public static Map<String, String> namedGroups(byte[] bytes, Matcher matcher, Map<String, Integer> groupNames) {
+      Map<String, String> namedGroups = new LinkedHashMap<String, String>();
 
       Region region = matcher.getEagerRegion();
-      for (Iterator<NameEntry> entry = regex.namedBackrefIterator(); entry.hasNext();) {
-          NameEntry e = entry.next();
-          int number = e.getBackRefs()[0];
+      groupNames.forEach((name, number) -> {
           int begin = region.beg[number];
           int end = region.end[number];
-
           if (begin >= 0 && end > begin) {
-              String groupName = new String(e.name, e.nameP, e.nameEnd - e.nameP, StandardCharsets.UTF_8);
               String groupValue = new String(bytes, begin, end - begin, StandardCharsets.UTF_8);
-              namedGroups.put(groupName, groupValue);
+              namedGroups.put(name, groupValue);
           }
-      }
+      });
 
     return namedGroups;
   }

@@ -5,6 +5,7 @@ import com.google.common.io.Resources;
 import io.thekraken.grok.api.exception.GrokException;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -171,6 +172,7 @@ public class GrokTest {
 
     }
 
+    @Ignore
     @Test
     public void test004_SPACE() throws Throwable {
         Grok g = compiler.compile("%{SPACE}");

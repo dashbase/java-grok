@@ -127,14 +127,16 @@ public class GrokCompiler {
       }
       iterationLeft--;
 
-      Regex regex = new Regex(GrokUtils.GROK_PATTERN);
+
+      Map<String, Integer> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN);
       byte[] bytes = namedRegex.getBytes(StandardCharsets.UTF_8);
       Matcher m = new Regex(GrokUtils.GROK_PATTERN).matcher(bytes);
+
       // Match %{Foo:bar} -> pattern name and subname
       // Match %{Foo=regex} -> add new regex definition
       if (m.search(0, bytes.length, Option.DEFAULT) != -1) {
         continueIteration = true;
-        Map<String, String> group = GrokUtils.namedGroups(bytes, m, regex);
+        Map<String, String> group = GrokUtils.namedGroups(bytes, m, namedGroups);
         if (group.get("definition") != null) {
           patternDefinitions.put(group.get("pattern"), group.get("definition"));
           group.put("name", group.get("name") + "=" + group.get("definition"));

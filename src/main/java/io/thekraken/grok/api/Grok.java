@@ -70,7 +70,7 @@ public class Grok {
    */
   private final Map<String, String> grokPatternDefinition;
 
-  public final Set<String> namedGroups;
+  public final Map<String, Integer> namedGroups;
 
   public final Map<String, Converter.Type> groupTypes;
 
