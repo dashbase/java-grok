@@ -20,6 +20,9 @@ import java.util.regex.Pattern;
 import static java.lang.String.format;
 
 public class GrokCompiler {
+  private static final Pattern UNSUPPORTED_NAMED_GROUP =
+      Pattern.compile("\\(\\?(?:P<|')([a-zA-Z][a-zA-Z0-9_.\\-]*)(?:>|')");
+
   /**
    * {@code Grok} patterns definitions.
    */
@@ -110,6 +113,22 @@ public class GrokCompiler {
 
     // output
     Map<String, String> namedRegexCollection = Maps.newHashMap();
+
+    Matcher matcher = UNSUPPORTED_NAMED_GROUP.matcher(namedRegex);
+
+    if (matcher.find()) {
+      StringBuffer sb = new StringBuffer();
+      do {
+        String original = matcher.group(1);
+        String alias = "NAMEDGROUP" + index;
+        namedRegexCollection.put(alias, original);
+        matcher.appendReplacement(sb, "\\(\\?<" + alias + ">");
+        index++;
+      } while (matcher.find());
+
+      matcher.appendTail(sb);
+      namedRegex = sb.toString();
+    }
 
     // Replace %{foo} with the regex (mostly group name regex)
     // and then compile the regex

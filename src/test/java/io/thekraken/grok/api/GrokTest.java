@@ -597,4 +597,11 @@ public class GrokTest {
         instant = (Instant) grok.match(dateWithTimeZone).capture().get("timestamp");
         assertEquals(ZonedDateTime.parse(dateWithTimeZone, dtf.withZone(ZoneOffset.ofHours(8))).toInstant(), instant);
     }
+
+    @Test
+    public void testQuotedNamedGroup() throws Exception {
+        Grok grok = compiler.compile("(?'kafka.log.trace.full'.*)", true);
+        Match match = grok.match("this is some trace");
+        assertEquals("this is some trace", match.capture().get("kafka.log.trace.full"));
+    }
 }
