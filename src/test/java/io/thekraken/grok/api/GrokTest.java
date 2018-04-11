@@ -604,4 +604,12 @@ public class GrokTest {
         Match match = grok.match("this is some trace");
         assertEquals("this is some trace", match.capture().get("kafka.log.trace.full"));
     }
+
+    @Test
+    public void testBrackets() throws Exception {
+        Grok grok = compiler.compile("{input}");
+        Match match = grok.match("{input}");
+        assertTrue(match != Match.EMPTY);
+        assertTrue(match.capture().isEmpty());
+    }
 }

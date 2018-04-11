@@ -105,6 +105,10 @@ public class GrokCompiler {
     }
 
     String namedRegex = pattern;
+    if (namedRegex.charAt(0) == '{' && namedRegex.charAt(namedRegex.length() - 1) == '}') {
+      namedRegex = "\\{" + namedRegex.subSequence(1, namedRegex.length() - 1) + "\\}";
+    }
+
     int index = 0;
     /** flag for infinite recursion */
     int iterationLeft = 1000;
