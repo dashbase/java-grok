@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -149,7 +150,10 @@ public class GrokCompiler {
       // Match %{Foo=regex} -> add new regex definition
       if (m.find()) {
         continueIteration = true;
-        Map<String, String> group = GrokUtils.namedGroups(m, namedGroups);
+        Map<String, String> group =
+            GrokUtils.namedGroups(m, namedGroups).entrySet().stream()
+                .filter(e -> e.getValue().value != null)
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().value));
         if (group.get("definition") != null) {
           patternDefinitions.put(group.get("pattern"), group.get("definition"));
           group.put("name", group.get("name") + "=" + group.get("definition"));

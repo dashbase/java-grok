@@ -38,8 +38,7 @@ public class CaptureTest {
         assertEquals("Hello World", m.getSubject());
         Map<String, Object> map = m.capture();
         assertEquals(1, map.size());
-        assertEquals("Hello World", map.get("foo"));
-        assertEquals("{foo=Hello World}", map.toString());
+        assertEquals("{foo=Hello World[0,11]}", map.toString());
     }
 
     @Test
@@ -52,9 +51,7 @@ public class CaptureTest {
         assertEquals("Hello World", m.getSubject());
         Map<String, Object> map = m.capture();
         assertEquals(2, map.size());
-        assertEquals("Hello", map.get("foo"));
-        assertEquals("World", map.get("bar"));
-        assertEquals("{bar=World, foo=Hello}", map.toString());
+        assertEquals("{bar=World[6,11], foo=Hello[0,5]}", map.toString());
     }
 
     @Test
@@ -67,9 +64,7 @@ public class CaptureTest {
         assertEquals("Hello World", m.getSubject());
         Map<String, Object> map = m.capture();
         assertEquals(2, map.size());
-        assertEquals("Hello World", map.get("foo"));
-        assertEquals("World", map.get("bar"));
-        assertEquals("{bar=World, foo=Hello World}", map.toString());
+        assertEquals("{bar=World[6,11], foo=Hello World[0,11]}", map.toString());
     }
 
     @Test
@@ -94,8 +89,8 @@ public class CaptureTest {
         Match m = grok.match("Hello");
         Map<String, Object> map = m.capture();
         assertEquals(1, map.size());
-        assertEquals("Hello", map.get(subname).toString());
-        assertEquals("{abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdef=Hello}", map.toString());
+        assertEquals("Hello[0,5]", map.get(subname).toString());
+        assertEquals("{abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdef=Hello[0,5]}", map.toString());
     }
 
     @Test
@@ -107,7 +102,7 @@ public class CaptureTest {
         Map<String, Object> map = m.capture();
         assertEquals(map.size(), 1);
         assertNull(map.get("ghijk"));
-        assertEquals(map.get("abcdef"), "abcdef");
+        assertEquals(map.get("abcdef").toString(), "abcdef[0,6]");
     }
     
     @SuppressWarnings("unchecked")
@@ -118,8 +113,8 @@ public class CaptureTest {
         Map<String, Object> map = m.capture();
     	assertEquals(map.size(), 1);
     	assertEquals(((List<Object>) (map.get("id"))).size(),2);
-    	assertEquals(((List<Object>) (map.get("id"))).get(0),"123");
-    	assertEquals(((List<Object>) (map.get("id"))).get(1),"456");
+    	assertEquals(((List<Object>) (map.get("id"))).get(0).toString(),"123[0,3]");
+    	assertEquals(((List<Object>) (map.get("id"))).get(1).toString(),"456[4,7]");
     }
 
     @SuppressWarnings("unchecked")
@@ -129,11 +124,11 @@ public class CaptureTest {
         Match m = grok.match("foo 123 bar");
         Map<String, Object> map = m.captureFlattened();
         assertEquals(map.size(), 1);
-        assertEquals(map.get("id"), "123");
+        assertEquals(map.get("id").toString(), "123[4,7]");
         Match m2 = grok.match("bar 123 foo");
         map = m2.captureFlattened();
         assertEquals(map.size(), 1);
-        assertEquals(map.get("id"), "123");
+        assertEquals(map.get("id").toString(), "123[4,7]");
 
         grok = compiler.compile("%{INT:id} %{INT:id}");
         Match m3 = grok.match("123 456");
