@@ -125,9 +125,9 @@ public class Match {
     // _capture.put("LINE", this.line);
     // _capture.put("LENGTH", this.line.length() +"");
 
-    Map<String, String> mappedw = GrokUtils.namedGroups(this.match, this.grok.namedGroups);
+    Map<String, Entity> mappedw = GrokUtils.namedGroups(this.match, this.grok.namedGroups);
 
-    mappedw.forEach((key, valueString) -> {
+    mappedw.forEach((key, entity) -> {
       String id = this.grok.getNamedRegexCollectionById(key);
       if (id != null && !id.isEmpty()) {
         key = id;
@@ -137,23 +137,19 @@ public class Match {
         return;
       }
 
-      Object value = valueString;
-      if (valueString != null) {
+      Object value = entity.value;
+      if (entity.value != null) {
         IConverter converter = grok.converters.get(key);
 
         if (converter != null) {
           key = Converter.extractKey(key);
           try {
-            value = converter.convert(valueString);
+            value = converter.convert(entity.value);
           } catch (Exception e) {
             capture.put(key + "_grokfailure", e.toString());
           }
-
-          if (value instanceof String) {
-            value = cleanString((String) value);
-          }
         } else {
-          value = cleanString(valueString);
+          value = cleanString(entity);
         }
       }
 
@@ -193,26 +189,26 @@ public class Match {
   /**
    * remove from the string the quote and double quote.
    *
-   * @param value string to pure: "my/text"
+   * @param entity string to pure: "my/text"
    * @return unquoted string: my/text
    */
-  private String cleanString(String value) {
-    if (value == null || value.isEmpty()) {
-      return value;
+  private Entity cleanString(Entity entity) {
+    if (entity.value == null || entity.value.isEmpty()) {
+      return entity;
     }
 
-    char firstChar = value.charAt(0);
-    char lastChar = value.charAt(value.length() - 1);
+    char firstChar = entity.value.charAt(0);
+    char lastChar = entity.value.charAt(entity.value.length() - 1);
 
     if (firstChar == lastChar && (firstChar == '"' || firstChar == '\'')) {
-      if (value.length() == 1) {
-        return "";
+      if (entity.value.length() == 1) {
+        return new Entity("", entity.start, entity.start);
       } else {
-        return value.substring(1, value.length() - 1);
+        return new Entity(entity.value.substring(1, entity.value.length() - 1), entity.start + 1, entity.end - 1);
       }
     }
 
-    return value;
+    return entity;
   }
 
 
@@ -262,5 +258,4 @@ public class Match {
   public Boolean isNull() {
     return this.match == null;
   }
-
 }
