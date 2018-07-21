@@ -14,8 +14,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -36,17 +35,16 @@ public class ApacheDataTypeTest {
 
         System.out.println(line);
         Match gm = g.match(line);
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
 
         assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
         Instant ts = ZonedDateTime.of(2004, 03, 07, 16, 45, 56, 0, ZoneOffset.ofHours(-8)).toInstant();
-        assertTrue(map.get("timestamp").equals(ts));
-        assertTrue(map.get("response").equals(Integer.valueOf(401)));
-        assertTrue(map.get("ident").equals(Boolean.FALSE));
-        assertTrue(map.get("httpversion").equals(Float.valueOf(1.1f)));
-        assertTrue(map.get("bytes").equals(Long.valueOf(12846)));
-        assertTrue(map.get("verb").equals("GET"));
-
+        assertEquals(ts, map.get("timestamp").value);
+        assertEquals(401, map.get("response").value);
+        assertEquals(Boolean.FALSE, map.get("ident").value);
+        assertEquals(1.1f, map.get("httpversion").value);
+        assertEquals(12846L, map.get("bytes").value);
+        assertEquals("GET[47,50]", map.get("verb").toString());
     }
 
     @Test
@@ -54,18 +52,17 @@ public class ApacheDataTypeTest {
         Grok g = compiler.compile("%{IPORHOST:clientip} %{USER:ident:boolean} %{USER:auth} \\[%{HTTPDATE:timestamp:date:dd/MMM/yyyy:HH:mm:ss Z}\\] \"(?:%{WORD:verb:string} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion:float})?|%{DATA:rawrequest})\" %{NUMBER:response:int} (?:%{NUMBER:bytes:long}|-)");
 
         Match gm = g.match(line);
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
 
         assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
 
         Instant ts = ZonedDateTime.of(2004, 03, 07, 16, 45, 56, 0, ZoneOffset.ofHours(-8)).toInstant();
-        assertTrue(map.get("timestamp").equals(ts));
-        assertTrue(map.get("response").equals(Integer.valueOf(401)));
-        assertTrue(map.get("ident").equals(Boolean.FALSE));
-        assertTrue(map.get("httpversion").equals(Float.valueOf(1.1f)));
-        assertTrue(map.get("bytes").equals(Long.valueOf(12846)));
-        assertTrue(map.get("verb").equals("GET"));
-
+        assertEquals(ts, map.get("timestamp").value);
+        assertEquals(401, map.get("response").value);
+        assertEquals(Boolean.FALSE, map.get("ident").value);
+        assertEquals(1.1f, map.get("httpversion").value);
+        assertEquals(12846L, map.get("bytes").value);
+        assertEquals("GET[47,50]", map.get("verb").toString());
     }
 
 }

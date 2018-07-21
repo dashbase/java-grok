@@ -150,10 +150,7 @@ public class GrokCompiler {
       // Match %{Foo=regex} -> add new regex definition
       if (m.find()) {
         continueIteration = true;
-        Map<String, String> group =
-            GrokUtils.namedGroups(m, namedGroups).entrySet().stream()
-                .filter(e -> e.getValue().value != null)
-                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().value));
+        Map<String, String> group = GrokUtils.namedGroups(m, namedGroups);
         if (group.get("definition") != null) {
           patternDefinitions.put(group.get("pattern"), group.get("definition"));
           group.put("name", group.get("name") + "=" + group.get("definition"));

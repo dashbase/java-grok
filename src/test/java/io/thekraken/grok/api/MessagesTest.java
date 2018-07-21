@@ -29,7 +29,7 @@ public class MessagesTest {
         System.out.println("Starting test with linux messages log -- may take a while");
         while ((line = br.readLine()) != null) {
             Match gm = g.match(line);
-            Map<String, Object> map = gm.capture();
+            Map<String, Entity> map = gm.capture();
             assertNotNull(gm.toJson());
             assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
         }

@@ -1,22 +1,17 @@
 package io.thekraken.grok.api;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.io.Resources;
+import io.thekraken.grok.api.exception.GrokException;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import io.thekraken.grok.api.exception.GrokException;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CaptureTest {
@@ -36,7 +31,7 @@ public class CaptureTest {
         Match m = grok.match("Hello World");
         assertEquals("(?<name0>.*)", grok.getNamedRegex());
         assertEquals("Hello World", m.getSubject());
-        Map<String, Object> map = m.capture();
+        Map<String, Entity> map = m.capture();
         assertEquals(1, map.size());
         assertEquals("{foo=Hello World[0,11]}", map.toString());
     }
@@ -49,7 +44,7 @@ public class CaptureTest {
         Match m = grok.match("Hello World");
         assertEquals("(?<name0>.*) (?<name1>.*)", grok.getNamedRegex());
         assertEquals("Hello World", m.getSubject());
-        Map<String, Object> map = m.capture();
+        Map<String, Entity> map = m.capture();
         assertEquals(2, map.size());
         assertEquals("{bar=World[6,11], foo=Hello[0,5]}", map.toString());
     }
@@ -62,7 +57,7 @@ public class CaptureTest {
         Match m = grok.match("Hello World");
         assertEquals("(?<name0>\\w+ (?<name1>\\w+))", grok.getNamedRegex());
         assertEquals("Hello World", m.getSubject());
-        Map<String, Object> map = m.capture();
+        Map<String, Entity> map = m.capture();
         assertEquals(2, map.size());
         assertEquals("{bar=World[6,11], foo=Hello World[0,11]}", map.toString());
     }
@@ -87,7 +82,7 @@ public class CaptureTest {
         compiler.register(name, "\\w+");
         Grok grok = compiler.compile("%{" + name + ":" + subname + "}");
         Match m = grok.match("Hello");
-        Map<String, Object> map = m.capture();
+        Map<String, Entity> map = m.capture();
         assertEquals(1, map.size());
         assertEquals("Hello[0,5]", map.get(subname).toString());
         assertEquals("{abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdef=Hello[0,5]}", map.toString());
@@ -99,7 +94,7 @@ public class CaptureTest {
         compiler.register("ghijk", "\\d+");
         Grok grok = compiler.compile("%{abcdef:abcdef}%{ghijk}", true);
         Match m = grok.match("abcdef12345");
-        Map<String, Object> map = m.capture();
+        Map<String, Entity> map = m.capture();
         assertEquals(map.size(), 1);
         assertNull(map.get("ghijk"));
         assertEquals(map.get("abcdef").toString(), "abcdef[0,6]");
@@ -110,11 +105,11 @@ public class CaptureTest {
     public void test007_captureDuplicateName() throws GrokException {
     	Grok grok = compiler.compile("%{INT:id} %{INT:id}");
     	Match m = grok.match("123 456");
-        Map<String, Object> map = m.capture();
+        Map<String, Entity> map = m.capture();
     	assertEquals(map.size(), 1);
-    	assertEquals(((List<Object>) (map.get("id"))).size(),2);
-    	assertEquals(((List<Object>) (map.get("id"))).get(0).toString(),"123[0,3]");
-    	assertEquals(((List<Object>) (map.get("id"))).get(1).toString(),"456[4,7]");
+    	assertEquals("123[0,3]", map.get("id").toString());
+    	assertEquals(1, map.get("id").additionalEntities.size());
+    	assertEquals("456[4,7]", map.get("id").additionalEntities.get(0).toString());
     }
 
     @SuppressWarnings("unchecked")
@@ -122,7 +117,7 @@ public class CaptureTest {
     public void test008_flattenDuplicateKeys() throws GrokException {
         Grok grok = compiler.compile("(?:foo %{INT:id} bar|bar %{INT:id} foo)");
         Match m = grok.match("foo 123 bar");
-        Map<String, Object> map = m.captureFlattened();
+        Map<String, Entity> map = m.captureFlattened();
         assertEquals(map.size(), 1);
         assertEquals(map.get("id").toString(), "123[4,7]");
         Match m2 = grok.match("bar 123 foo");

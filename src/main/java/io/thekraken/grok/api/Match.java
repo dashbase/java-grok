@@ -46,7 +46,7 @@ public class Match {
   private final int start;
   private final int end;
 
-  private Map<String, Object> capture = Collections.emptyMap();
+  private Map<String, Entity> capture = Collections.emptyMap();
 
   /**
    * Create a new {@code Match} object.
@@ -91,7 +91,7 @@ public class Match {
    * Multiple values for the same key are stored as list.
    *
    */
-  public Map<String, Object> capture() {
+  public Map<String, Entity> capture() {
     return capture(false);
   }
 
@@ -107,11 +107,11 @@ public class Match {
    * See also {@link #capture} which returns multiple values of the same key as list.
    *
    */
-  public Map<String, Object> captureFlattened() {
+  public Map<String, Entity> captureFlattened() {
     return capture(true);
   }
 
-  private Map<String, Object> capture(boolean flattened ) {
+  private Map<String, Entity> capture(boolean flattened ) {
     if (match == null) {
       return Collections.emptyMap();
     }
@@ -125,7 +125,7 @@ public class Match {
     // _capture.put("LINE", this.line);
     // _capture.put("LENGTH", this.line.length() +"");
 
-    Map<String, Entity> mappedw = GrokUtils.namedGroups(this.match, this.grok.namedGroups);
+    Map<String, Entity> mappedw = GrokUtils.namedGroupsWithOffset(this.match, this.grok.namedGroups);
 
     mappedw.forEach((key, entity) -> {
       String id = this.grok.getNamedRegexCollectionById(key);
@@ -137,47 +137,34 @@ public class Match {
         return;
       }
 
-      Object value = entity.value;
-      if (entity.value != null) {
-        IConverter converter = grok.converters.get(key);
+      IConverter converter = grok.converters.get(key);
 
-        if (converter != null) {
-          key = Converter.extractKey(key);
-          try {
-            value = converter.convert(entity.value);
-          } catch (Exception e) {
-            capture.put(key + "_grokfailure", e.toString());
-          }
-        } else {
-          value = cleanString(entity);
+      if (converter != null) {
+        key = Converter.extractKey(key);
+        try {
+          entity.value = converter.convert(entity.value.toString());
+        } catch (Exception e) {
+          entity.value = e.toString();
+          capture.put(key + "_grokfailure", entity);
         }
       }
 
-      if (capture.containsKey(key)) {
-        Object currentValue = capture.get(key);
+      entity = cleanString(entity);
 
+      Entity currentValue = capture.get(key);
+
+      if (currentValue != null) {
         if (flattened) {
-          if (currentValue == null && value != null) {
-            capture.put(key, value);
-          } if (currentValue != null && value != null) {
-            throw new RuntimeException(
-                format("key '%s' has multiple non-null values, this is not allowed in flattened mode, values:'%s', '%s'",
-                    key,
-                    currentValue,
-                    value));
-          }
+          throw new RuntimeException(
+              format("key '%s' has multiple non-null values, this is not allowed in flattened mode, values:'%s', '%s'",
+                  key,
+                  currentValue,
+                  entity));
         } else {
-          if (currentValue instanceof List) {
-            ((List<Object>) currentValue).add(value);
-          } else {
-            List<Object> list = new ArrayList<Object>();
-            list.add(currentValue);
-            list.add(value);
-            capture.put(key, list);
-          }
+          currentValue.additionalEntities.add(entity);
         }
       } else {
-        capture.put(key, value);
+        capture.put(key, entity);
       }
     });
 
@@ -193,18 +180,22 @@ public class Match {
    * @return unquoted string: my/text
    */
   private Entity cleanString(Entity entity) {
-    if (entity.value == null || entity.value.isEmpty()) {
+    if (!(entity.value instanceof String)) {
+      return entity;
+    }
+    String value = entity.value.toString();
+    if (value == null || value.isEmpty()) {
       return entity;
     }
 
-    char firstChar = entity.value.charAt(0);
-    char lastChar = entity.value.charAt(entity.value.length() - 1);
+    char firstChar = value.charAt(0);
+    char lastChar = value.charAt(value.length() - 1);
 
     if (firstChar == lastChar && (firstChar == '"' || firstChar == '\'')) {
-      if (entity.value.length() == 1) {
+      if (value.length() == 1) {
         return new Entity("", entity.start, entity.start);
       } else {
-        return new Entity(entity.value.substring(1, entity.value.length() - 1), entity.start + 1, entity.end - 1);
+        return new Entity(value.substring(1, value.length() - 1), entity.start + 1, entity.end - 1);
       }
     }
 

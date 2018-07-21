@@ -42,11 +42,25 @@ public class GrokUtils {
     return namedGroups;
   }
 
-  public static Map<String, Entity> namedGroups(Matcher matcher, Set<String> groupNames) {
+  public static Map<String, String> namedGroups(Matcher matcher, Set<String> groupNames) {
+    Map<String, String> namedGroups = new LinkedHashMap<>();
+    for (String groupName : groupNames) {
+      String groupValue = matcher.group(groupName);
+      if (groupValue != null) {
+        namedGroups.put(groupName, groupValue);
+      }
+    }
+    return namedGroups;
+  }
+
+  public static Map<String, Entity> namedGroupsWithOffset(Matcher matcher, Set<String> groupNames) {
     Map<String, Entity> namedGroups = new LinkedHashMap<>();
     for (String groupName : groupNames) {
-      Entity entity = new Entity(matcher.group(groupName), matcher.start(groupName), matcher.end(groupName));
-      namedGroups.put(groupName, entity);
+      String groupValue = matcher.group(groupName);
+      if (groupValue != null) {
+        Entity entity = new Entity(groupValue, matcher.start(groupName), matcher.end(groupName));
+        namedGroups.put(groupName, entity);
+      }
     }
     return namedGroups;
   }

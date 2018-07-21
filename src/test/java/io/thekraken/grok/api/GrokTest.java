@@ -76,7 +76,7 @@ public class GrokTest {
 
         Grok staticGrok = compiler.compile("%{USERNAME}");
         Match gm = staticGrok.match("root");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{USERNAME=root[0,4]}", map.toString());
 
         gm = staticGrok.match("r00t");
@@ -102,7 +102,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{USERNAME}");
 
         Match gm = g.match("root");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{USERNAME=root[0,4]}", map.toString());
 
         gm = g.match("r00t");
@@ -127,7 +127,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{USER}");
 
         Match gm = g.match("root");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{USER=root[0,4]}", map.toString());
 
         gm = g.match("r00t");
@@ -152,7 +152,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{NUMBER}");
 
         Match gm = g.match("-42");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{NUMBER=-42[0,3]}", map.toString());
 
     }
@@ -162,7 +162,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{WORD}");
 
         Match gm = g.match("a");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{WORD=a[0,1]}", map.toString());
 
         gm = g.match("abc");
@@ -176,7 +176,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{SPACE}");
 
         Match gm = g.match("abc dc");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{SPACE=[0,0]}", map.toString());
 
     }
@@ -186,7 +186,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{NUMBER}");
 
         Match gm = g.match("Something costs $55.4!");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{NUMBER=55.4[17,21]}", map.toString());
 
     }
@@ -196,7 +196,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{NOTSPACE}");
 
         Match gm = g.match("abc dc");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{NOTSPACE=abc[0,3]}", map.toString());
 
     }
@@ -206,7 +206,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{QUOTEDSTRING:text}");
 
         Match gm = g.match("\"abc dc\"");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{text=abc dc[1,7]}", map.toString());
     }
 
@@ -215,7 +215,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{UUID}");
 
         Match gm = g.match("61243740-4786-11e3-86a7-0002a5d5c51b");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{UUID=61243740-4786-11e3-86a7-0002a5d5c51b[0,36]}", map.toString());
 
         gm = g.match("7F8C7CB0-4786-11E3-8F96-0800200C9A66");
@@ -233,7 +233,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{MAC}");
 
         Match gm = g.match("5E:FF:56:A2:AF:15");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{MAC=5E:FF:56:A2:AF:15[0,17]}", map.toString());
 
     }
@@ -243,7 +243,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{IPORHOST}");
 
         Match gm = g.match("www.google.fr");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("{IPORHOST=www.google.fr[0,13]}", map.toString());
 
         gm = g.match("www.google.com");
@@ -256,7 +256,7 @@ public class GrokTest {
         Grok g = compiler.compile("%{HOSTPORT}");
 
         Match gm = g.match("www.google.fr:80");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertEquals("www.google.fr:80[0,16]", map.get("HOSTPORT").toString());
         assertEquals("www.google.fr[0,13]", map.get("IPORHOST").toString());
         assertEquals("80[14,16]", map.get("PORT").toString());
@@ -268,7 +268,7 @@ public class GrokTest {
 
         Match gm =
                 g.match("112.169.19.192 - - [06/Mar/2013:01:36:30 +0900] \"GET / HTTP/1.1\" 200 44346 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.152 Safari/537.22\"");
-        Map<String, Object> map = gm.capture();
+        Map<String, Entity> map = gm.capture();
         assertNotNull(gm.toJson());
         assertEquals(
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.152 Safari/537.22[80,200]",
@@ -325,7 +325,7 @@ public class GrokTest {
         int i = 0;
         for (String day : days) {
             Match m = grok.match(day);
-            Map<String, Object> map = m.capture();
+            Map<String, Entity> map = m.capture();
             assertNotNull(map);
             assertEquals(((Entity) map.get("DAY")).value, days.get(i));
             i++;
@@ -341,7 +341,7 @@ public class GrokTest {
         System.out.println("Starting test with ip");
         while ((line = br.readLine()) != null) {
             Match gm = grok.match(line);
-            Map<String, Object> map = gm.capture();
+            Map<String, Entity> map = gm.capture();
             assertNotNull(gm.toJson());
             assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
             assertEquals(((Entity)map.get("IP")).value, line);
@@ -360,7 +360,7 @@ public class GrokTest {
         int i = 0;
         for (String month : months) {
             Match m = grok.match(month);
-            Map<String, Object> map = m.capture();
+            Map<String, Entity> map = m.capture();
             assertNotNull(map);
             assertEquals(((Entity)map.get("MONTH")).value, months.get(i));
             i++;
@@ -391,7 +391,7 @@ public class GrokTest {
         int i = 0;
         for (String time : times) {
             Match m = grok.match(time);
-            Map<String, Object> map = m.capture();
+            Map<String, Entity> map = m.capture();
             assertNotNull(map);
             assertEquals(((Entity)map.get("TIMESTAMP_ISO8601")).value, times.get(i));
             i++;
@@ -435,7 +435,7 @@ public class GrokTest {
         int i = 0;
         for (String uri : uris) {
             Match m = grok.match(uri);
-            Map<String, Object> map = m.capture();
+            Map<String, Entity> map = m.capture();
             assertNotNull(map);
             assertEquals(((Entity)map.get("URI")).value, uris.get(i));
             assertNotNull(map.get("URIPROTO"));
@@ -458,7 +458,7 @@ public class GrokTest {
         int i = 0;
         for (String uri : uris) {
             Match m = grok.match(uri);
-            Map<String, Object> map = m.capture();
+            Map<String, Entity> map = m.capture();
             assertNotNull(map);
             if (i == 2) {
                 assertEquals(Collections.EMPTY_MAP, map);
@@ -477,7 +477,7 @@ public class GrokTest {
 
         String text = "<< barfoobarfoo >>";
         Match match = g.match(text);
-        Map<String, Object> map = match.capture();
+        Map<String, Entity> map = match.capture();
         assertEquals(
             "<< barfoobarfoo >>[0,18]",
                 map.get("text").toString());
@@ -507,7 +507,7 @@ public class GrokTest {
 
     private void assertMatches(String description, Grok grok, String text) {
         Match match = grok.match(text);
-        Map<String, Object> map = match.capture();
+        Map<String, Entity> map = match.capture();
         assertEquals(format("%s: unable to parse '%s'", description, text),
                 text,
             ((Entity) map.get("text")).value);
@@ -567,11 +567,11 @@ public class GrokTest {
         assertNull(grok.groupTypes.get("host"));
 
        Match match = grok.match("07/Mar/2004:16:45:56 -0800 test 64.242.88.10:8080");
-       Map<String, Object> result = match.capture();
-       assertEquals("test", result.get("username"));
+       Map<String, Entity> result = match.capture();
+       assertEquals("test[27,31]", result.get("username").toString());
        assertEquals("64.242.88.10[32,44]", result.get("host").toString());
-       assertEquals(8080, result.get("port"));
-       assertTrue(result.get("timestamp") instanceof Instant);
+       assertEquals(8080, result.get("port").value);
+       assertTrue(result.get("timestamp").value instanceof Instant);
     }
 
     @Test
@@ -580,20 +580,20 @@ public class GrokTest {
         String date = "03/19/2018 14:11:00";
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
         Grok grok = compiler.compile("%{DATESTAMP:timestamp;date;MM/dd/yyyy HH:mm:ss}", true);
-        Instant instant = (Instant) grok.match(date).capture().get("timestamp");
+        Instant instant = (Instant) grok.match(date).capture().get("timestamp").value;
         assertEquals(ZonedDateTime.parse(date, dtf.withZone(ZoneOffset.UTC)).toInstant(), instant);
 
         // set default timezone to PST
         ZoneId PST = ZoneId.of("PST", ZoneId.SHORT_IDS);
         grok = compiler.compile("%{DATESTAMP:timestamp;date;MM/dd/yyyy HH:mm:ss}", PST, true);
-        instant = (Instant) grok.match(date).capture().get("timestamp");
+        instant = (Instant) grok.match(date).capture().get("timestamp").value;
         assertEquals(ZonedDateTime.parse(date, dtf.withZone(PST)).toInstant(), instant);
 
         // when timestamp has timezone, use it instead of the default.
         String dateWithTimeZone = "07/Mar/2004:16:45:56 +0800";
         dtf = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z");
         grok = compiler.compile("%{HTTPDATE:timestamp;date;dd/MMM/yyyy:HH:mm:ss Z}", PST, true);
-        instant = (Instant) grok.match(dateWithTimeZone).capture().get("timestamp");
+        instant = (Instant) grok.match(dateWithTimeZone).capture().get("timestamp").value;
         assertEquals(ZonedDateTime.parse(dateWithTimeZone, dtf.withZone(ZoneOffset.ofHours(8))).toInstant(), instant);
     }
 
