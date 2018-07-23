@@ -17,7 +17,7 @@ public class TestPerformance {
     long start = System.currentTimeMillis();
     for (int i=0; i < 1000000; i++) {
       Match match = grok.match(input);
-      Map<String, Object> map = match.capture();
+      Map<String, Entity> map = match.capture();
     }
     long end = System.currentTimeMillis();
     System.out.println("took: " + (end-start) + " millis");
