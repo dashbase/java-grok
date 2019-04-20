@@ -611,4 +611,12 @@ public class GrokTest {
         assertTrue(match != Match.EMPTY);
         assertTrue(match.capture().isEmpty());
     }
+
+    @Test
+    public void testDatetimePattern() throws Exception {
+        Grok grok = compiler.compile("\\[%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss}\\]");
+        Match match = grok.match("[2019-04-06 16:16:50]");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        assertEquals(ZonedDateTime.parse("2019-04-06 16:16:50", dtf.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").value);
+    }
 }
