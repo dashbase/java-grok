@@ -17,17 +17,12 @@ plugins {
   id 'maven-publish'
   id 'eclipse'
   id 'idea'
+  id 'checkstyle'
 }
 
-// Apply code quality checks
-apply from: "$rootProject.projectDir/gradle/codeQuality.gradle"
 // Publish artifact to Maven repositiory
 if (project.hasProperty("signing")) {
   apply from: "$rootProject.projectDir/gradle/publishArtifact.gradle"
-}
-
-task wrapper(type: Wrapper) {
-  gradleVersion = '3.1'
 }
 
 repositories {
@@ -39,7 +34,7 @@ sourceCompatibility = 10
 targetCompatibility = 10
 group = "io.thekraken"
 archivesBaseName = "grok"
-version = '0.1.7-SNAPSHOT'
+version = '0.1.8'
 
 dependencies {
   compile "org.apache.commons:commons-lang3:3.7"
@@ -51,6 +46,12 @@ dependencies {
 }
 
 def awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials()
+
+checkstyle {
+  configFile = new File(rootDir, './_tools/checkstyle/checkstyle.xml')
+  sourceSets = [sourceSets.main]
+  ignoreFailures = true
+}
 
 publishing {
   publications {
