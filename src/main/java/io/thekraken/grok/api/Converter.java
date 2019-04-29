@@ -43,6 +43,7 @@ public class Converter {
       this.converter = converter;
       this.aliases = Arrays.asList(aliases);
     }
+
   }
 
   private static final CharMatcher DELIMITER = CharMatcher.anyOf(";:");
@@ -123,7 +124,7 @@ class DateConverter implements IConverter<Instant> {
 
   @Override
   public Instant convert(String value) {
-    TemporalAccessor dt = formatter.parseBest(value.trim(), ZonedDateTime::from, LocalDateTime::from);
+    TemporalAccessor dt = formatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
     if (dt instanceof ZonedDateTime) {
       return ((ZonedDateTime)dt).toInstant();
     } else {

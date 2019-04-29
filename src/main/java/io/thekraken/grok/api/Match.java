@@ -125,9 +125,10 @@ public class Match {
     // _capture.put("LINE", this.line);
     // _capture.put("LENGTH", this.line.length() +"");
 
-    Map<String, Entity> mappedw = GrokUtils.namedGroupsWithOffset(this.match, this.grok.namedGroups);
+    var entities = GrokUtils.namedGroupsWithOffset(this.match, this.grok.namedGroups);
 
-    mappedw.forEach((key, entity) -> {
+    entities.forEach(entity -> {
+      var key = entity.groupName;
       String id = this.grok.getNamedRegexCollectionById(key);
       if (id != null && !id.isEmpty()) {
         key = id;
@@ -137,19 +138,9 @@ public class Match {
         return;
       }
 
-      IConverter converter = grok.converters.get(key);
+      entity.setConverter(grok.converters.get(key));
 
-      if (converter != null) {
-        key = Converter.extractKey(key);
-        try {
-          entity.value = converter.convert(entity.value.toString());
-        } catch (Exception e) {
-          entity.value = e.toString();
-          capture.put(key + "_grokfailure", entity);
-        }
-      }
-
-      entity = cleanString(entity);
+      //entity = cleanString(entity);
 
       Entity currentValue = capture.get(key);
 
@@ -161,7 +152,7 @@ public class Match {
                   currentValue,
                   entity));
         } else {
-          currentValue.additionalEntities.add(entity);
+          currentValue.addEntity(entity);
         }
       } else {
         capture.put(key, entity);
@@ -179,6 +170,7 @@ public class Match {
    * @param entity string to pure: "my/text"
    * @return unquoted string: my/text
    */
+  /*
   private Entity cleanString(Entity entity) {
     if (!(entity.value instanceof String)) {
       return entity;
@@ -201,7 +193,7 @@ public class Match {
 
     return entity;
   }
-
+*/
 
   /**
    * Get the json representation of the matched element.
