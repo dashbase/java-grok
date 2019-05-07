@@ -91,7 +91,10 @@ public class Converter {
   }
 
   public static String extractKey(String key) {
-    return SPLITTER.split(key).iterator().next();
+    if (DELIMITER.matchesAnyOf(key)) {
+      return SPLITTER.split(key).iterator().next();
+    }
+    return key;
   }
 }
 

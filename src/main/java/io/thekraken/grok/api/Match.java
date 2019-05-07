@@ -141,10 +141,9 @@ public class Match {
       }
 
       var converter = grok.converters.get(groupName);
+      groupName = Converter.extractKey(groupName);
 
       var entity = new Entity(subject, groupName, start, end, converter);
-
-      //entity = cleanString(entity);
 
       Entity currentValue = capture.get(groupName);
 
@@ -168,37 +167,6 @@ public class Match {
 
     return capture;
   }
-
-  /**
-   * remove from the string the quote and double quote.
-   *
-   * @param entity string to pure: "my/text"
-   * @return unquoted string: my/text
-   */
-  /*
-  private Entity cleanString(Entity entity) {
-    if (!(entity.value instanceof String)) {
-      return entity;
-    }
-    String value = entity.value.toString();
-    if (value == null || value.isEmpty()) {
-      return entity;
-    }
-
-    char firstChar = value.charAt(0);
-    char lastChar = value.charAt(value.length() - 1);
-
-    if (firstChar == lastChar && (firstChar == '"' || firstChar == '\'')) {
-      if (value.length() == 1) {
-        return new Entity("", entity.start, entity.start);
-      } else {
-        return new Entity(value.substring(1, value.length() - 1), entity.start + 1, entity.end - 1);
-      }
-    }
-
-    return entity;
-  }
-*/
 
   /**
    * Get the json representation of the matched element.
