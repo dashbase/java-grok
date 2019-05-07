@@ -143,7 +143,7 @@ public class Match {
       var converter = grok.converters.get(groupName);
       groupName = Converter.extractKey(groupName);
 
-      var entity = new Entity(subject, groupName, start, end, converter);
+      var entity = new Entity(subject, start, end, converter);
 
       Entity currentValue = capture.get(groupName);
 

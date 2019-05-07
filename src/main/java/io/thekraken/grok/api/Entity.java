@@ -1,14 +1,12 @@
 package io.thekraken.grok.api;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Entity {
-    public final CharSequence subject;
-    public final String groupName;
+    private final CharSequence subject;
     public final int start;
     public final int end;
     @Nullable
@@ -17,9 +15,8 @@ public class Entity {
     public List<Entity> additionalEntities = Collections.emptyList();
 
 
-    public Entity(CharSequence subject, String groupName, int start, int end, IConverter converter) {
+    public Entity(CharSequence subject, int start, int end, IConverter converter) {
         this.subject = subject;
-        this.groupName = groupName;
 
         if (start != end) {
             char firstChar = subject.charAt(start);
