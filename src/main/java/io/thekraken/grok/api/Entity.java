@@ -1,41 +1,49 @@
 package io.thekraken.grok.api;
 
-import com.google.common.collect.Lists;
-
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Entity {
-    public String groupName;
+    public final CharSequence subject;
+    public final String groupName;
     public final int start;
     public final int end;
-
-    private List<Entity> additionalEntities = null;
-
     @Nullable
-    private IConverter converter;
+    private final IConverter converter;
 
-    public Entity(String groupName, int start, int end) {
+    public List<Entity> additionalEntities = Collections.emptyList();
+
+
+    public Entity(CharSequence subject, String groupName, int start, int end, IConverter converter) {
+        this.subject = subject;
         this.groupName = groupName;
+
+        if (start != end) {
+            char firstChar = subject.charAt(start);
+            char lastChar = subject.charAt(end - 1);
+            if (firstChar == lastChar && (firstChar == '"' || firstChar == '\'')) {
+                start++;
+                end--;
+            }
+        }
         this.start = start;
         this.end = end;
-    }
-
-    public void setConverter(IConverter converter) {
         this.converter = converter;
     }
 
-    public Object getValue(CharSequence subject) {
+    public Object getValue() {
         var substring = subject.subSequence(start, end);
         if (converter != null) {
-            return converter.convert(substring.toString());
+            return converter.convert(substring);
         }
         return substring;
     }
 
     public void addEntity(Entity entity) {
-        if (additionalEntities == null) {
+        if (additionalEntities.isEmpty()) {
             additionalEntities = new LinkedList<>();
         }
         additionalEntities.add(entity);
@@ -43,6 +51,6 @@ public class Entity {
 
     @Override
     public String toString() {
-        return groupName + "[" + start + "," + end + "]";
+        return getValue() + "[" + start + "," + end + "]";
     }
 }

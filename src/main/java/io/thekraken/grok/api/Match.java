@@ -125,39 +125,44 @@ public class Match {
     // _capture.put("LINE", this.line);
     // _capture.put("LENGTH", this.line.length() +"");
 
-    var entities = GrokUtils.namedGroupsWithOffset(this.match, this.grok.namedGroups);
-
-    entities.forEach(entity -> {
-      var key = entity.groupName;
-      String id = this.grok.getNamedRegexCollectionById(key);
+    this.grok.namedGroups.forEach(groupName -> {
+      int start = match.start(groupName);
+      int end = match.end(groupName);
+      if (start < 0) {
+        return;
+      }
+      String id = this.grok.getNamedRegexCollectionById(groupName);
       if (id != null && !id.isEmpty()) {
-        key = id;
+        groupName = id;
       }
 
-      if ("UNWANTED".equals(key)) {
+      if ("UNWANTED".equals(groupName)) {
         return;
       }
 
-      entity.setConverter(grok.converters.get(key));
+      var converter = grok.converters.get(groupName);
+
+      var entity = new Entity(subject, groupName, start, end, converter);
 
       //entity = cleanString(entity);
 
-      Entity currentValue = capture.get(key);
+      Entity currentValue = capture.get(groupName);
 
       if (currentValue != null) {
         if (flattened) {
           throw new RuntimeException(
               format("key '%s' has multiple non-null values, this is not allowed in flattened mode, values:'%s', '%s'",
-                  key,
+                  groupName,
                   currentValue,
                   entity));
         } else {
           currentValue.addEntity(entity);
         }
       } else {
-        capture.put(key, entity);
+        capture.put(groupName, entity);
       }
     });
+
 
     capture = Collections.unmodifiableMap(capture);
 

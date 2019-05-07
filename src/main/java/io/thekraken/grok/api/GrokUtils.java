@@ -54,11 +54,4 @@ public class GrokUtils {
     }
     return namedGroups;
   }
-
-  public static Stream<Entity> namedGroupsWithOffset(Matcher matcher, Set<String> groupNames) {
-    return groupNames.stream().map(groupName -> {
-      int start = matcher.start(groupName);
-      return start < 0 ? null : new Entity(groupName, start, matcher.end(groupName));
-    }).filter(Objects::nonNull);
-  }
 }

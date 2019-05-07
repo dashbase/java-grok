@@ -327,7 +327,7 @@ public class GrokTest {
             Match m = grok.match(day);
             Map<String, Entity> map = m.capture();
             assertNotNull(map);
-            assertEquals(((Entity) map.get("DAY")).value, days.get(i));
+            assertEquals(((Entity) map.get("DAY")).getValue(), days.get(i));
             i++;
         }
     }
@@ -344,7 +344,7 @@ public class GrokTest {
             Map<String, Entity> map = gm.capture();
             assertNotNull(gm.toJson());
             assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
-            assertEquals(((Entity)map.get("IP")).value, line);
+            assertEquals(((Entity)map.get("IP")).getValue(), line);
         }
     }
 
@@ -362,7 +362,7 @@ public class GrokTest {
             Match m = grok.match(month);
             Map<String, Entity> map = m.capture();
             assertNotNull(map);
-            assertEquals(((Entity)map.get("MONTH")).value, months.get(i));
+            assertEquals(((Entity)map.get("MONTH")).getValue(), months.get(i));
             i++;
         }
     }
@@ -393,7 +393,7 @@ public class GrokTest {
             Match m = grok.match(time);
             Map<String, Entity> map = m.capture();
             assertNotNull(map);
-            assertEquals(((Entity)map.get("TIMESTAMP_ISO8601")).value, times.get(i));
+            assertEquals(((Entity)map.get("TIMESTAMP_ISO8601")).getValue(), times.get(i));
             i++;
         }
     }
@@ -437,7 +437,7 @@ public class GrokTest {
             Match m = grok.match(uri);
             Map<String, Entity> map = m.capture();
             assertNotNull(map);
-            assertEquals(((Entity)map.get("URI")).value, uris.get(i));
+            assertEquals(((Entity)map.get("URI")).getValue(), uris.get(i));
             assertNotNull(map.get("URIPROTO"));
             i++;
         }
@@ -510,7 +510,7 @@ public class GrokTest {
         Map<String, Entity> map = match.capture();
         assertEquals(format("%s: unable to parse '%s'", description, text),
                 text,
-            ((Entity) map.get("text")).value);
+            ((Entity) map.get("text")).getValue());
     }
 
     @Test
@@ -570,8 +570,8 @@ public class GrokTest {
        Map<String, Entity> result = match.capture();
        assertEquals("test[27,31]", result.get("username").toString());
        assertEquals("64.242.88.10[32,44]", result.get("host").toString());
-       assertEquals(8080, result.get("port").value);
-       assertTrue(result.get("timestamp").value instanceof Instant);
+       assertEquals(8080, result.get("port").getValue());
+       assertTrue(result.get("timestamp").getValue() instanceof Instant);
     }
 
     @Test
@@ -580,20 +580,20 @@ public class GrokTest {
         String date = "03/19/2018 14:11:00";
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
         Grok grok = compiler.compile("%{DATESTAMP:timestamp;date;MM/dd/yyyy HH:mm:ss}", true);
-        Instant instant = (Instant) grok.match(date).capture().get("timestamp").value;
+        Instant instant = (Instant) grok.match(date).capture().get("timestamp").getValue();
         assertEquals(ZonedDateTime.parse(date, dtf.withZone(ZoneOffset.UTC)).toInstant(), instant);
 
         // set default timezone to PST
         ZoneId PST = ZoneId.of("PST", ZoneId.SHORT_IDS);
         grok = compiler.compile("%{DATESTAMP:timestamp;date;MM/dd/yyyy HH:mm:ss}", PST, true);
-        instant = (Instant) grok.match(date).capture().get("timestamp").value;
+        instant = (Instant) grok.match(date).capture().get("timestamp").getValue();
         assertEquals(ZonedDateTime.parse(date, dtf.withZone(PST)).toInstant(), instant);
 
         // when timestamp has timezone, use it instead of the default.
         String dateWithTimeZone = "07/Mar/2004:16:45:56 +0800";
         dtf = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z");
         grok = compiler.compile("%{HTTPDATE:timestamp;date;dd/MMM/yyyy:HH:mm:ss Z}", PST, true);
-        instant = (Instant) grok.match(dateWithTimeZone).capture().get("timestamp").value;
+        instant = (Instant) grok.match(dateWithTimeZone).capture().get("timestamp").getValue();
         assertEquals(ZonedDateTime.parse(dateWithTimeZone, dtf.withZone(ZoneOffset.ofHours(8))).toInstant(), instant);
     }
 
@@ -617,6 +617,6 @@ public class GrokTest {
         Grok grok = compiler.compile("\\[%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss}\\]");
         Match match = grok.match("[2019-04-06 16:16:50]");
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        assertEquals(ZonedDateTime.parse("2019-04-06 16:16:50", dtf.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").value);
+        assertEquals(ZonedDateTime.parse("2019-04-06 16:16:50", dtf.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
     }
 }

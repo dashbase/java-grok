@@ -3,7 +3,6 @@ package io.thekraken.grok.api;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -20,13 +19,13 @@ import java.util.stream.Collectors;
  */
 public class Converter {
   public enum Type {
-    BYTE(Byte::valueOf),
-    BOOLEAN(Boolean::valueOf),
-    SHORT(Short::valueOf),
-    INT(Integer::valueOf, "integer"),
-    LONG(Long::valueOf),
-    FLOAT(Float::valueOf),
-    DOUBLE(Double::valueOf),
+    BYTE(s -> Byte.parseByte(s.toString())),
+    BOOLEAN(s -> Boolean.parseBoolean(s.toString())),
+    SHORT(s -> Short.parseShort(s.toString())),
+    INT(s -> Integer.parseInt(s, 0, s.length(), 10), "integer"),
+    LONG(s -> Long.parseLong(s, 0, s.length(), 10)),
+    FLOAT(s -> Float.parseFloat(s.toString())),
+    DOUBLE(s -> Double.parseDouble(s.toString())),
     DATETIME(new DateConverter(), "date"),
     STRING(v -> v, "text"),
 
@@ -100,7 +99,7 @@ public class Converter {
 // Converters
 //
 interface IConverter<T> {
-  T convert(String value);
+  T convert(CharSequence value);
 
   default IConverter<T> newConverter(String param, Object... params) {
     return this;
@@ -123,7 +122,7 @@ class DateConverter implements IConverter<Instant> {
   }
 
   @Override
-  public Instant convert(String value) {
+  public Instant convert(CharSequence value) {
     TemporalAccessor dt = formatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
     if (dt instanceof ZonedDateTime) {
       return ((ZonedDateTime)dt).toInstant();
@@ -138,5 +137,3 @@ class DateConverter implements IConverter<Instant> {
     return new DateConverter(DateTimeFormatter.ofPattern(param), (ZoneId) params[0]);
   }
 }
-
-
