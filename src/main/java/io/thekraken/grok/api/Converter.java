@@ -3,6 +3,8 @@ package io.thekraken.grok.api;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -113,30 +115,49 @@ interface IConverter<T> {
 class DateConverter implements IConverter<Instant> {
   private final DateTimeFormatter formatter;
   private final ZoneId timeZone;
+  private final boolean useCache;
+
+  private final Cache<CharSequence, Instant> timestampCache =
+      CacheBuilder.newBuilder().maximumSize(1000).build();
 
   public DateConverter() {
     this.formatter = DateTimeFormatter.ISO_DATE_TIME;
     this.timeZone = ZoneOffset.UTC;
+    this.useCache = true;
   }
 
-  private DateConverter(DateTimeFormatter formatter, ZoneId timeZone) {
+  private DateConverter(DateTimeFormatter formatter, ZoneId timeZone, boolean useCache) {
     this.formatter = formatter;
     this.timeZone = timeZone;
+    this.useCache = useCache;
   }
 
   @Override
   public Instant convert(CharSequence value) {
-    TemporalAccessor dt = formatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
-    if (dt instanceof ZonedDateTime) {
-      return ((ZonedDateTime)dt).toInstant();
-    } else {
-      return ((LocalDateTime) dt).atZone(timeZone).toInstant();
+    if (useCache) {
+      var ts = timestampCache.getIfPresent(value);
+      if (ts != null) {
+        return ts;
+      }
     }
+
+    TemporalAccessor dt = formatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
+    Instant ts;
+    if (dt instanceof ZonedDateTime) {
+      ts =  ((ZonedDateTime)dt).toInstant();
+    } else {
+      ts = ((LocalDateTime) dt).atZone(timeZone).toInstant();
+    }
+    if (useCache) {
+      timestampCache.put(value, ts);
+    }
+    return ts;
   }
 
   @Override
   public DateConverter newConverter(String param, Object... params) {
     Preconditions.checkArgument(params.length == 1 && params[0] instanceof ZoneId);
-    return new DateConverter(DateTimeFormatter.ofPattern(param), (ZoneId) params[0]);
+    boolean useCache = !(param.contains("S") || param.contains("n") || param.contains("N") || param.contains("A"));
+    return new DateConverter(DateTimeFormatter.ofPattern(param), (ZoneId) params[0], useCache);
   }
 }

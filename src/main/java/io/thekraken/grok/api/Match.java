@@ -141,7 +141,9 @@ public class Match {
       }
 
       var converter = grok.converters.get(groupName);
-      groupName = Converter.extractKey(groupName);
+      if (converter != null) {
+        groupName = Converter.extractKey(groupName);
+      }
 
       var entity = new Entity(subject, start, end, converter);
 
