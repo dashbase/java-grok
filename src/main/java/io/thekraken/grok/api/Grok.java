@@ -18,9 +18,6 @@ package io.thekraken.grok.api;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -149,36 +146,6 @@ public class Grok {
    */
   public Map<String, String> getNamedRegexCollection() {
     return namedRegexCollection;
-  }
-
-  /**
-   * Match the given <tt>log</tt> with the named regex.
-   * And return the json representation of the matched element
-   *
-   * @param log : log to match
-   * @return json representation og the log
-   */
-  public String capture(String log){
-    Match match = match(log);
-    match.capture();
-    return match.toJson();
-  }
-
-  /**
-   * Match the given list of <tt>log</tt> with the named regex
-   * and return the list of json representation of the matched elements.
-   *
-   * @param logs : list of log
-   * @return list of json representation of the log
-   */
-  public List<String> capture(List<String> logs){
-    List<String> matched = new ArrayList<String>();
-    for (String log : logs) {
-      Match match = match(log);
-      match.capture();
-      matched.add(match.toJson());
-    }
-    return matched;
   }
 
   /**

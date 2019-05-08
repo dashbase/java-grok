@@ -9,8 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 
 public class MessagesTest {
@@ -30,8 +29,7 @@ public class MessagesTest {
         while ((line = br.readLine()) != null) {
             Match gm = g.match(line);
             Map<String, Entity> map = gm.capture();
-            assertNotNull(gm.toJson());
-            assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
+            assertTrue(!map.isEmpty());
         }
         br.close();
     }

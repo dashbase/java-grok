@@ -1,24 +1,53 @@
 package io.thekraken.grok.api;
 
-import com.google.common.collect.Lists;
-
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Entity {
-    public Object value;
+    private final CharSequence subject;
     public final int start;
     public final int end;
+    @Nullable
+    private final IConverter converter;
 
-    public final List<Entity> additionalEntities = Lists.newLinkedList();
+    public List<Entity> additionalEntities = Collections.emptyList();
 
-    public Entity(Object value, int start, int end) {
-        this.value = value;
+
+    public Entity(CharSequence subject, int start, int end, IConverter converter) {
+        this.subject = subject;
+
+        if (start != end) {
+            char firstChar = subject.charAt(start);
+            char lastChar = subject.charAt(end - 1);
+            if (firstChar == lastChar && (firstChar == '"' || firstChar == '\'')) {
+                start++;
+                end--;
+            }
+        }
         this.start = start;
         this.end = end;
+        this.converter = converter;
+    }
+
+    public Object getValue() {
+        var substring = subject.subSequence(start, end);
+        if (converter != null) {
+            return converter.convert(substring);
+        }
+        return substring;
+    }
+
+    public void addEntity(Entity entity) {
+        if (additionalEntities.isEmpty()) {
+            additionalEntities = new LinkedList<>();
+        }
+        additionalEntities.add(entity);
     }
 
     @Override
     public String toString() {
-        return value + "[" + start + "," + end + "]";
+        return getValue() + "[" + start + "," + end + "]";
     }
 }

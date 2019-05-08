@@ -3,6 +3,8 @@ package io.thekraken.grok.api;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -48,18 +50,6 @@ public class GrokUtils {
       String groupValue = matcher.group(groupName);
       if (groupValue != null) {
         namedGroups.put(groupName, groupValue);
-      }
-    }
-    return namedGroups;
-  }
-
-  public static Map<String, Entity> namedGroupsWithOffset(Matcher matcher, Set<String> groupNames) {
-    Map<String, Entity> namedGroups = new LinkedHashMap<>();
-    for (String groupName : groupNames) {
-      String groupValue = matcher.group(groupName);
-      if (groupValue != null) {
-        Entity entity = new Entity(groupValue, matcher.start(groupName), matcher.end(groupName));
-        namedGroups.put(groupName, entity);
       }
     }
     return namedGroups;

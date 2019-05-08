@@ -14,7 +14,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -37,13 +37,12 @@ public class ApacheDataTypeTest {
         Match gm = g.match(line);
         Map<String, Entity> map = gm.capture();
 
-        assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
         Instant ts = ZonedDateTime.of(2004, 03, 07, 16, 45, 56, 0, ZoneOffset.ofHours(-8)).toInstant();
-        assertEquals(ts, map.get("timestamp").value);
-        assertEquals(401, map.get("response").value);
-        assertEquals(Boolean.FALSE, map.get("ident").value);
-        assertEquals(1.1f, map.get("httpversion").value);
-        assertEquals(12846L, map.get("bytes").value);
+        assertEquals(ts, map.get("timestamp").getValue());
+        assertEquals(401, map.get("response").getValue());
+        assertEquals(Boolean.FALSE, map.get("ident").getValue());
+        assertEquals(1.1f, map.get("httpversion").getValue());
+        assertEquals(12846L, map.get("bytes").getValue());
         assertEquals("GET[47,50]", map.get("verb").toString());
     }
 
@@ -54,14 +53,12 @@ public class ApacheDataTypeTest {
         Match gm = g.match(line);
         Map<String, Entity> map = gm.capture();
 
-        assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
-
         Instant ts = ZonedDateTime.of(2004, 03, 07, 16, 45, 56, 0, ZoneOffset.ofHours(-8)).toInstant();
-        assertEquals(ts, map.get("timestamp").value);
-        assertEquals(401, map.get("response").value);
-        assertEquals(Boolean.FALSE, map.get("ident").value);
-        assertEquals(1.1f, map.get("httpversion").value);
-        assertEquals(12846L, map.get("bytes").value);
+        assertEquals(ts, map.get("timestamp").getValue());
+        assertEquals(401, map.get("response").getValue());
+        assertEquals(Boolean.FALSE, map.get("ident").getValue());
+        assertEquals(1.1f, map.get("httpversion").getValue());
+        assertEquals(12846L, map.get("bytes").getValue());
         assertEquals("GET[47,50]", map.get("verb").toString());
     }
 

@@ -3,7 +3,8 @@ package io.thekraken.grok.api;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -20,13 +21,13 @@ import java.util.stream.Collectors;
  */
 public class Converter {
   public enum Type {
-    BYTE(Byte::valueOf),
-    BOOLEAN(Boolean::valueOf),
-    SHORT(Short::valueOf),
-    INT(Integer::valueOf, "integer"),
-    LONG(Long::valueOf),
-    FLOAT(Float::valueOf),
-    DOUBLE(Double::valueOf),
+    BYTE(s -> Byte.parseByte(s.toString())),
+    BOOLEAN(s -> Boolean.parseBoolean(s.toString())),
+    SHORT(s -> Short.parseShort(s.toString())),
+    INT(s -> Integer.parseInt(s, 0, s.length(), 10), "integer"),
+    LONG(s -> Long.parseLong(s, 0, s.length(), 10)),
+    FLOAT(s -> Float.parseFloat(s.toString())),
+    DOUBLE(s -> Double.parseDouble(s.toString())),
     DATETIME(new DateConverter(), "date"),
     STRING(v -> v, "text"),
 
@@ -43,6 +44,7 @@ public class Converter {
       this.converter = converter;
       this.aliases = Arrays.asList(aliases);
     }
+
   }
 
   private static final CharMatcher DELIMITER = CharMatcher.anyOf(";:");
@@ -91,7 +93,10 @@ public class Converter {
   }
 
   public static String extractKey(String key) {
-    return SPLITTER.split(key).iterator().next();
+    if (DELIMITER.matchesAnyOf(key)) {
+      return SPLITTER.split(key).iterator().next();
+    }
+    return key;
   }
 }
 
@@ -99,7 +104,7 @@ public class Converter {
 // Converters
 //
 interface IConverter<T> {
-  T convert(String value);
+  T convert(CharSequence value);
 
   default IConverter<T> newConverter(String param, Object... params) {
     return this;
@@ -110,32 +115,49 @@ interface IConverter<T> {
 class DateConverter implements IConverter<Instant> {
   private final DateTimeFormatter formatter;
   private final ZoneId timeZone;
+  private final boolean useCache;
+
+  private final Cache<CharSequence, Instant> timestampCache =
+      CacheBuilder.newBuilder().maximumSize(1000).build();
 
   public DateConverter() {
     this.formatter = DateTimeFormatter.ISO_DATE_TIME;
     this.timeZone = ZoneOffset.UTC;
+    this.useCache = true;
   }
 
-  private DateConverter(DateTimeFormatter formatter, ZoneId timeZone) {
+  private DateConverter(DateTimeFormatter formatter, ZoneId timeZone, boolean useCache) {
     this.formatter = formatter;
     this.timeZone = timeZone;
+    this.useCache = useCache;
   }
 
   @Override
-  public Instant convert(String value) {
-    TemporalAccessor dt = formatter.parseBest(value.trim(), ZonedDateTime::from, LocalDateTime::from);
-    if (dt instanceof ZonedDateTime) {
-      return ((ZonedDateTime)dt).toInstant();
-    } else {
-      return ((LocalDateTime) dt).atZone(timeZone).toInstant();
+  public Instant convert(CharSequence value) {
+    if (useCache) {
+      var ts = timestampCache.getIfPresent(value);
+      if (ts != null) {
+        return ts;
+      }
     }
+
+    TemporalAccessor dt = formatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
+    Instant ts;
+    if (dt instanceof ZonedDateTime) {
+      ts =  ((ZonedDateTime)dt).toInstant();
+    } else {
+      ts = ((LocalDateTime) dt).atZone(timeZone).toInstant();
+    }
+    if (useCache) {
+      timestampCache.put(value, ts);
+    }
+    return ts;
   }
 
   @Override
   public DateConverter newConverter(String param, Object... params) {
     Preconditions.checkArgument(params.length == 1 && params[0] instanceof ZoneId);
-    return new DateConverter(DateTimeFormatter.ofPattern(param), (ZoneId) params[0]);
+    boolean useCache = !(param.contains("S") || param.contains("n") || param.contains("N") || param.contains("A"));
+    return new DateConverter(DateTimeFormatter.ofPattern(param), (ZoneId) params[0], useCache);
   }
 }
-
-

@@ -17,12 +17,8 @@ package io.thekraken.grok.api;
 
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -35,10 +31,6 @@ import static java.lang.String.format;
  * @since 0.0.1
  */
 public class Match {
-
-  private static final Gson PRETTY_GSON =
-          new GsonBuilder().setPrettyPrinting().create();
-  private static final Gson GSON = new GsonBuilder().create();
 
   private final CharSequence subject; // texte
   private final Grok grok;
@@ -125,120 +117,49 @@ public class Match {
     // _capture.put("LINE", this.line);
     // _capture.put("LENGTH", this.line.length() +"");
 
-    Map<String, Entity> mappedw = GrokUtils.namedGroupsWithOffset(this.match, this.grok.namedGroups);
-
-    mappedw.forEach((key, entity) -> {
-      String id = this.grok.getNamedRegexCollectionById(key);
+    this.grok.namedGroups.forEach(groupName -> {
+      int start = match.start(groupName);
+      int end = match.end(groupName);
+      if (start < 0) {
+        return;
+      }
+      String id = this.grok.getNamedRegexCollectionById(groupName);
       if (id != null && !id.isEmpty()) {
-        key = id;
+        groupName = id;
       }
 
-      if ("UNWANTED".equals(key)) {
+      if ("UNWANTED".equals(groupName)) {
         return;
       }
 
-      IConverter converter = grok.converters.get(key);
-
+      var converter = grok.converters.get(groupName);
       if (converter != null) {
-        key = Converter.extractKey(key);
-        try {
-          entity.value = converter.convert(entity.value.toString());
-        } catch (Exception e) {
-          entity.value = e.toString();
-          capture.put(key + "_grokfailure", entity);
-        }
+        groupName = Converter.extractKey(groupName);
       }
 
-      entity = cleanString(entity);
+      var entity = new Entity(subject, start, end, converter);
 
-      Entity currentValue = capture.get(key);
+      Entity currentValue = capture.get(groupName);
 
       if (currentValue != null) {
         if (flattened) {
           throw new RuntimeException(
               format("key '%s' has multiple non-null values, this is not allowed in flattened mode, values:'%s', '%s'",
-                  key,
+                  groupName,
                   currentValue,
                   entity));
         } else {
-          currentValue.additionalEntities.add(entity);
+          currentValue.addEntity(entity);
         }
       } else {
-        capture.put(key, entity);
+        capture.put(groupName, entity);
       }
     });
+
 
     capture = Collections.unmodifiableMap(capture);
 
     return capture;
-  }
-
-  /**
-   * remove from the string the quote and double quote.
-   *
-   * @param entity string to pure: "my/text"
-   * @return unquoted string: my/text
-   */
-  private Entity cleanString(Entity entity) {
-    if (!(entity.value instanceof String)) {
-      return entity;
-    }
-    String value = entity.value.toString();
-    if (value == null || value.isEmpty()) {
-      return entity;
-    }
-
-    char firstChar = value.charAt(0);
-    char lastChar = value.charAt(value.length() - 1);
-
-    if (firstChar == lastChar && (firstChar == '"' || firstChar == '\'')) {
-      if (value.length() == 1) {
-        return new Entity("", entity.start, entity.start);
-      } else {
-        return new Entity(value.substring(1, value.length() - 1), entity.start + 1, entity.end - 1);
-      }
-    }
-
-    return entity;
-  }
-
-
-  /**
-   * Get the json representation of the matched element.
-   * <p>
-   * example: map [ {IP: 127.0.0.1}, {status:200}] will return {"IP":"127.0.0.1", "status":200}
-   * </p>
-   * If pretty is set to true, json will return prettyprint json string.
-   *
-   * @return Json of the matched element in the text
-   */
-  public String toJson(boolean pretty) {
-    if (capture == null) {
-      return "{}";
-    }
-    if (capture.isEmpty()) {
-      return "{}";
-    }
-
-    Gson gs;
-    if (pretty) {
-      gs = PRETTY_GSON;
-    } else {
-      gs = GSON;
-    }
-    return gs.toJson(/* cleanMap( */capture/* ) */);
-  }
-
-  /**
-   * Get the json representation of the matched element.
-   * <p>
-   * example: map [ {IP: 127.0.0.1}, {status:200}] will return {"IP":"127.0.0.1", "status":200}
-   * </p>
-   *
-   * @return Json of the matched element in the text
-   */
-  public String toJson() {
-    return toJson(false);
   }
 
   /**

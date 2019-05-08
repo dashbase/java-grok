@@ -12,8 +12,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -40,9 +39,8 @@ public class ApacheTest {
         while ((line = br.readLine()) != null) {
             //System.out.println(line);
             Match gm = g.match(line);
-            gm.capture();
-            assertNotNull(gm.toJson());
-            assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
+            var map = gm.capture();
+            assertTrue(!map.isEmpty());
         }
         br.close();
     }
@@ -59,9 +57,8 @@ public class ApacheTest {
             while ((line = br.readLine()) != null) {
                 //System.out.println(child.getName() + " " +line);
                 Match gm = g.match(line);
-                gm.capture();
-                assertNotNull(gm.toJson());
-                assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
+                var map = gm.capture();
+                assertTrue(!map.isEmpty());
             }
             br.close();
         }
