@@ -1,6 +1,5 @@
 package io.thekraken.grok.api;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import io.thekraken.grok.api.exception.GrokException;
 import org.junit.Before;
@@ -269,7 +268,7 @@ public class GrokTest {
         Match gm =
                 g.match("112.169.19.192 - - [06/Mar/2013:01:36:30 +0900] \"GET / HTTP/1.1\" 200 44346 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.152 Safari/537.22\"");
         Map<String, Entity> map = gm.capture();
-        assertNotNull(gm.toJson());
+        assertFalse(map.isEmpty());
         assertEquals(
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.152 Safari/537.22[80,200]",
             map.get("agent").toString());
@@ -281,7 +280,7 @@ public class GrokTest {
         gm =
                 g.match("112.169.19.192 - - [06/Mar/2013:01:36:30 +0900] \"GET /wp-content/plugins/easy-table/themes/default/style.css?ver=1.0 HTTP/1.1\" 304 - \"http://www.nflabs.com/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.152 Safari/537.22\"");
         map = gm.capture();
-        assertNotNull(gm.toJson());
+        assertFalse(map.isEmpty());
         // System.out.println(gm.toJson());
         assertEquals(
                 map.get("agent").toString(),
@@ -342,8 +341,7 @@ public class GrokTest {
         while ((line = br.readLine()) != null) {
             Match gm = grok.match(line);
             Map<String, Entity> map = gm.capture();
-            assertNotNull(gm.toJson());
-            assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
+            assertFalse(map.isEmpty());
             assertEquals(((Entity)map.get("IP")).getValue(), line);
         }
     }

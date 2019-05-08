@@ -14,7 +14,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -37,7 +37,6 @@ public class ApacheDataTypeTest {
         Match gm = g.match(line);
         Map<String, Entity> map = gm.capture();
 
-        assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
         Instant ts = ZonedDateTime.of(2004, 03, 07, 16, 45, 56, 0, ZoneOffset.ofHours(-8)).toInstant();
         assertEquals(ts, map.get("timestamp").getValue());
         assertEquals(401, map.get("response").getValue());
@@ -53,8 +52,6 @@ public class ApacheDataTypeTest {
 
         Match gm = g.match(line);
         Map<String, Entity> map = gm.capture();
-
-        assertNotEquals("{\"Error\":\"Error\"}", gm.toJson());
 
         Instant ts = ZonedDateTime.of(2004, 03, 07, 16, 45, 56, 0, ZoneOffset.ofHours(-8)).toInstant();
         assertEquals(ts, map.get("timestamp").getValue());

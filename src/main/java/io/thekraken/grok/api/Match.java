@@ -17,12 +17,8 @@ package io.thekraken.grok.api;
 
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -35,10 +31,6 @@ import static java.lang.String.format;
  * @since 0.0.1
  */
 public class Match {
-
-  private static final Gson PRETTY_GSON =
-          new GsonBuilder().setPrettyPrinting().create();
-  private static final Gson GSON = new GsonBuilder().create();
 
   private final CharSequence subject; // texte
   private final Grok grok;
@@ -168,44 +160,6 @@ public class Match {
     capture = Collections.unmodifiableMap(capture);
 
     return capture;
-  }
-
-  /**
-   * Get the json representation of the matched element.
-   * <p>
-   * example: map [ {IP: 127.0.0.1}, {status:200}] will return {"IP":"127.0.0.1", "status":200}
-   * </p>
-   * If pretty is set to true, json will return prettyprint json string.
-   *
-   * @return Json of the matched element in the text
-   */
-  public String toJson(boolean pretty) {
-    if (capture == null) {
-      return "{}";
-    }
-    if (capture.isEmpty()) {
-      return "{}";
-    }
-
-    Gson gs;
-    if (pretty) {
-      gs = PRETTY_GSON;
-    } else {
-      gs = GSON;
-    }
-    return gs.toJson(/* cleanMap( */capture/* ) */);
-  }
-
-  /**
-   * Get the json representation of the matched element.
-   * <p>
-   * example: map [ {IP: 127.0.0.1}, {status:200}] will return {"IP":"127.0.0.1", "status":200}
-   * </p>
-   *
-   * @return Json of the matched element in the text
-   */
-  public String toJson() {
-    return toJson(false);
   }
 
   /**

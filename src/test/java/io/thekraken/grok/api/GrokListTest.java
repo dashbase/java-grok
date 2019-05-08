@@ -39,14 +39,9 @@ public class GrokListTest {
 
 
         Grok grok = compiler.compile("%{IP}");
-        List<String> json = grok.capture(logs);
-        assertNotNull(json);
-        int i = 0;
-        for (String elem : json) {
-            assertNotNull(elem);
-            assertEquals(elem, grok.capture(logs.get(i)));
-            i++;
-            //assert
+        for (String log : logs) {
+            var map = grok.match(log).capture();
+            assertEquals(log, map.get("IP").getValue());
         }
 
     }
@@ -57,7 +52,6 @@ public class GrokListTest {
 
         logs.add("178.21.82.201");
         logs.add("11.178.94.216");
-        logs.add("");
         logs.add("231.49.38.155");
         logs.add("206.0.116.17");
         logs.add("191.199.247.47");
@@ -67,15 +61,9 @@ public class GrokListTest {
 
 
         Grok grok = compiler.compile("%{IP}");
-        List<String> json = grok.capture(logs);
-        assertNotNull(json);
-        int i = 0;
-        for (String elem : json) {
-            System.out.println(elem);
-            assertNotNull(elem);
-            assertEquals(elem, grok.capture(logs.get(i)));
-            i++;
-            //assert
+        for (String log : logs) {
+            var map = grok.match(log).capture();
+            assertEquals(log, map.get("IP").getValue());
         }
 
     }
