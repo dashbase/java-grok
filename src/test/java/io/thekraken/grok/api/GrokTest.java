@@ -616,6 +616,17 @@ public class GrokTest {
         Match match = grok.match("[2019-04-06 16:16:50]");
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         assertEquals(ZonedDateTime.parse("2019-04-06 16:16:50", dtf.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
+
+        grok = compiler.compile("\\[%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd'T'HH:mm:ss}\\]");
+        match = grok.match("[2019-04-06T16:16:50]");
+        assertEquals(ZonedDateTime.parse("2019-04-06T16:16:50", DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
+    }
+
+    @Test
+    public void testDatetimeWithoutPattern() throws Exception {
+        Grok grok = compiler.compile("\\[%{TIMESTAMP_ISO8601:timestamp:datetime}\\]");
+        Match match = grok.match("[2019-04-06T16:16:50]");
+        assertEquals(ZonedDateTime.parse("2019-04-06T16:16:50", DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
     }
 
     @Test
