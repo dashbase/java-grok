@@ -8,6 +8,8 @@ import com.google.common.cache.CacheBuilder;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.function.Function;
@@ -141,6 +143,14 @@ class DateConverter implements IConverter<Instant> {
       }
     }
 
+    // if (formatter's pattern doesn't have year, month or date) {
+    LocalDate today = LocalDate.now(timeZone);
+    var formatter = new DateTimeFormatterBuilder().append(this.formatter)
+            .parseDefaulting(ChronoField.YEAR, today.getYear())
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, today.getMonthValue())
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, today.getDayOfMonth())
+            .toFormatter().withZone(timeZone);
+    // }
     TemporalAccessor dt = formatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
     Instant ts;
     if (dt instanceof ZonedDateTime) {

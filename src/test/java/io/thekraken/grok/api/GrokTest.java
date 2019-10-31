@@ -623,6 +623,21 @@ public class GrokTest {
     }
 
     @Test
+    public void testTimeOnlyPattern() throws Exception {
+        Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:HH:mm:ss}\\]");
+        Match match = grok.match("[16:16:50]");
+        // TODO: use today's date below
+        assertEquals(ZonedDateTime.parse("2019-10-31T16:16:50", DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
+    }
+
+    @Test
+    public void testNoYearPattern() throws Exception {
+        Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:MMM dd HH:mm:ss}\\]");
+        Match match = grok.match("[Apr 06 16:16:50]");
+        assertEquals(ZonedDateTime.parse("2019-04-06T16:16:50", DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
+    }
+
+    @Test
     public void testDatetimeWithoutPattern() throws Exception {
         Grok grok = compiler.compile("\\[%{TIMESTAMP_ISO8601:timestamp:datetime}\\]");
         Match match = grok.match("[2019-04-06T16:16:50]");
