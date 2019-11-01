@@ -119,6 +119,8 @@ class DateConverter implements IConverter<Instant> {
   private final ZoneId timeZone;
   private final boolean useCache;
   private final String pattern;
+  private final Clock clock;
+  private final boolean containsYear;
 
   private final Cache<CharSequence, Instant> timestampCache =
       CacheBuilder.newBuilder().maximumSize(1000).build();
@@ -128,21 +130,22 @@ class DateConverter implements IConverter<Instant> {
     this.timeZone = ZoneOffset.UTC;
     this.useCache = true;
     this.pattern = null;
+    this.clock = Clock.systemUTC();
+    this.containsYear = true;
   }
 
-  private DateConverter(DateTimeFormatter formatter, String pattern, ZoneId timeZone, boolean useCache) {
+  private DateConverter(DateTimeFormatter formatter, String pattern, ZoneId timeZone, boolean useCache, Clock clock) {
     this.formatter = formatter;
     this.timeZone = timeZone;
     this.useCache = useCache;
     this.pattern = pattern;
-  }
-
-  public boolean containsYear() {
+    this.clock = clock;
     if (pattern != null) {
       var format = pattern.toLowerCase();
-      return format.contains("u") || format.contains("y");
+      this.containsYear = format.contains("u") || format.contains("y");
+    } else {
+      this.containsYear = true;
     }
-    return false;
   }
 
   @Override
@@ -156,8 +159,8 @@ class DateConverter implements IConverter<Instant> {
 
     var formatter = this.formatter;
 
-    if (!containsYear()) {
-      LocalDate today = LocalDate.now(timeZone);
+    if (!containsYear) {
+      LocalDate today = LocalDate.now(clock);
       formatter = new DateTimeFormatterBuilder().append(this.formatter)
               .parseDefaulting(ChronoField.YEAR, today.getYear())
               .parseDefaulting(ChronoField.MONTH_OF_YEAR, today.getMonthValue())
@@ -180,8 +183,13 @@ class DateConverter implements IConverter<Instant> {
 
   @Override
   public DateConverter newConverter(String param, Object... params) {
-    Preconditions.checkArgument(params.length == 1 && params[0] instanceof ZoneId);
+    Preconditions.checkArgument(params.length > 0 && params[0] instanceof ZoneId);
+    ZoneId zoneId = (ZoneId)params[0];
+    var clock = Clock.system(zoneId);
+    if (params.length > 1 && params[1] instanceof Clock) {
+      clock = (Clock)params[1];
+    }
     boolean useCache = !(param.contains("S") || param.contains("n") || param.contains("N") || param.contains("A"));
-    return new DateConverter(DateTimeFormatter.ofPattern(param), param, (ZoneId) params[0], useCache);
+    return new DateConverter(DateTimeFormatter.ofPattern(param), param, (ZoneId) params[0], useCache, clock);
   }
 }

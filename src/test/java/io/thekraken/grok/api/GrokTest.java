@@ -9,10 +9,7 @@ import org.junit.runners.MethodSorters;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -624,7 +621,9 @@ public class GrokTest {
 
     @Test
     public void testTimeOnlyPattern() throws Exception {
-        Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:HH:mm:ss}\\]");
+        Clock clock = Clock.fixed(ZonedDateTime.parse("2019-10-31T00:00:00",
+                DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), ZoneId.of("UTC"));
+        Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:HH:mm:ss}\\]", clock);
         Match match = grok.match("[16:16:50]");
         // TODO: use today's date below
         assertEquals(ZonedDateTime.parse("2019-10-31T16:16:50", DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
@@ -632,7 +631,9 @@ public class GrokTest {
 
     @Test
     public void testNoYearPattern() throws Exception {
-        Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:MMM dd HH:mm:ss}\\]");
+        Clock clock = Clock.fixed(ZonedDateTime.parse("2019-01-01T00:00:00",
+                DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), ZoneId.of("UTC"));
+        Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:MMM dd HH:mm:ss}\\]", clock);
         Match match = grok.match("[Apr 06 16:16:50]");
         assertEquals(ZonedDateTime.parse("2019-04-06T16:16:50", DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
     }

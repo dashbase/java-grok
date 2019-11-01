@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -81,15 +82,27 @@ public class GrokCompiler {
     }
   }
 
+  public Grok compile(String pattern) {
+    return compile(pattern, Clock.systemUTC());
+  }
+
   /**
    * Compiles a given Grok pattern and returns a Grok object which can parse the pattern.
    */
-  public Grok compile(String pattern) {
-    return compile(pattern, false);
+  public Grok compile(String pattern, Clock clock) {
+    return compile(pattern, false, clock);
   }
 
   public Grok compile(final String pattern, boolean namedOnly) {
-    return compile(pattern, ZoneOffset.UTC, namedOnly);
+    return compile(pattern, namedOnly, Clock.systemUTC());
+  }
+
+  public Grok compile(final String pattern, boolean namedOnly, Clock clock) {
+    return compile(pattern, ZoneOffset.UTC, namedOnly, clock);
+  }
+
+  public Grok compile(final String pattern, ZoneId defaultTimeZone, boolean namedOnly) {
+    return compile(pattern, defaultTimeZone, namedOnly, Clock.systemUTC());
   }
 
   /**
@@ -99,7 +112,7 @@ public class GrokCompiler {
    * @param defaultTimeZone: time zone used to parse a timestamp when it doesn't contain the time zone
    * @param namedOnly : Whether to capture named expressions only or not (i.e. %{IP:ip} but not ${IP})
    */
-  public Grok compile(final String pattern, ZoneId defaultTimeZone, boolean namedOnly) {
+  public Grok compile(final String pattern, ZoneId defaultTimeZone, boolean namedOnly, Clock clock) {
 
     if (StringUtils.isBlank(pattern)) {
       throw new IllegalArgumentException("{pattern} should not be empty or null");
@@ -185,7 +198,7 @@ public class GrokCompiler {
         namedRegex,
         namedRegexCollection,
         patternDefinitions,
-        defaultTimeZone
+        defaultTimeZone, clock
     );
   }
 }
