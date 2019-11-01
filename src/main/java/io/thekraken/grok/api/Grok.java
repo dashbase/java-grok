@@ -17,7 +17,6 @@ package io.thekraken.grok.api;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.time.Clock;
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.Set;

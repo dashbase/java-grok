@@ -181,7 +181,6 @@ class DateConverter implements IConverter<Instant> {
   @Override
   public DateConverter newConverter(String param, Object... params) {
     Preconditions.checkArgument(params.length == 1 && params[0] instanceof ZoneId);
-    ZoneId zoneId = (ZoneId)params[0];
     boolean useCache = !(param.contains("S") || param.contains("n") || param.contains("N") || param.contains("A"));
     return new DateConverter(DateTimeFormatter.ofPattern(param), param, (ZoneId) params[0], useCache);
   }
