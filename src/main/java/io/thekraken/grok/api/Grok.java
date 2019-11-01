@@ -85,15 +85,14 @@ public class Grok {
               String namedRegex,
               Map<String, String> namedRegexCollection,
               Map<String, String> patternDefinitions,
-              ZoneId defaultTimeZone,
-              Clock clock) {
+              ZoneId defaultTimeZone) {
     this.originalGrokPattern = pattern;
     this.namedRegex = namedRegex;
     this.compiledNamedRegex = Pattern.compile(namedRegex, Pattern.DOTALL);
     this.namedRegexCollection = namedRegexCollection;
     this.namedGroups = GrokUtils.getNameGroups(namedRegex);
     this.groupTypes = Converter.getGroupTypes(namedRegexCollection.values());
-    this.converters = Converter.getConverters(namedRegexCollection.values(), defaultTimeZone, clock);
+    this.converters = Converter.getConverters(namedRegexCollection.values(), defaultTimeZone);
     this.grokPatternDefinition = patternDefinitions;
   }
 
