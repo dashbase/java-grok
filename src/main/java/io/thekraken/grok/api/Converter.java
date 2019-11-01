@@ -140,7 +140,7 @@ class DateConverter implements IConverter<Instant> {
   public boolean containsYear() {
     if (pattern != null) {
       var format = pattern.toLowerCase();
-      return format.contains("u") || format.contains("y") || format.contains("Y");
+      return format.contains("u") || format.contains("y");
     }
     return false;
   }
