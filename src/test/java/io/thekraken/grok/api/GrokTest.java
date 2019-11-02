@@ -9,10 +9,7 @@ import org.junit.runners.MethodSorters;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -623,9 +620,49 @@ public class GrokTest {
     }
 
     @Test
+    public void testTimeOnlyPattern() throws Exception {
+        Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:HH:mm:ss}\\]");
+        Match match = grok.match("[16:16:50]");
+        ZonedDateTime today = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime zdt = ZonedDateTime.ofInstant((Instant) (match.capture().get("timestamp").getValue()), ZoneOffset.UTC);
+
+        assertEquals(today.getYear(), zdt.getYear());
+        assertEquals(today.getMonthValue(), zdt.getMonthValue());
+        assertEquals(today.getDayOfMonth(), zdt.getDayOfMonth());
+        assertEquals(16, zdt.getHour());
+        assertEquals(16, zdt.getMinute());
+        assertEquals(50, zdt.getSecond());
+    }
+
+    @Test
+    public void testNoYearPattern() throws Exception {
+        Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:MMM dd HH:mm:ss}\\]");
+        Match match = grok.match("[Apr 06 16:16:50]");
+
+        ZonedDateTime today = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime zdt = ZonedDateTime.ofInstant((Instant) (match.capture().get("timestamp").getValue()), ZoneOffset.UTC);
+
+        assertEquals(today.getYear(), zdt.getYear());
+        assertEquals(4, zdt.getMonthValue());
+        assertEquals(6, zdt.getDayOfMonth());
+        assertEquals(16, zdt.getHour());
+        assertEquals(16, zdt.getMinute());
+        assertEquals(50, zdt.getSecond());
+    }
+
+    @Test
     public void testDatetimeWithoutPattern() throws Exception {
         Grok grok = compiler.compile("\\[%{TIMESTAMP_ISO8601:timestamp:datetime}\\]");
         Match match = grok.match("[2019-04-06T16:16:50]");
+        ZonedDateTime zdt = ZonedDateTime.ofInstant((Instant) (match.capture().get("timestamp").getValue()), ZoneOffset.UTC);
+
+        assertEquals(2019, zdt.getYear());
+        assertEquals(4, zdt.getMonthValue());
+        assertEquals(6, zdt.getDayOfMonth());
+        assertEquals(16, zdt.getHour());
+        assertEquals(16, zdt.getMinute());
+        assertEquals(50, zdt.getSecond());
+
         assertEquals(ZonedDateTime.parse("2019-04-06T16:16:50", DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
     }
 

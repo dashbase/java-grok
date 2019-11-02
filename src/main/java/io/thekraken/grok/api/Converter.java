@@ -8,6 +8,8 @@ import com.google.common.cache.CacheBuilder;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.function.Function;
@@ -116,6 +118,8 @@ class DateConverter implements IConverter<Instant> {
   private final DateTimeFormatter formatter;
   private final ZoneId timeZone;
   private final boolean useCache;
+  private final String pattern;
+  private final boolean containsYear;
 
   private final Cache<CharSequence, Instant> timestampCache =
       CacheBuilder.newBuilder().maximumSize(1000).build();
@@ -124,12 +128,17 @@ class DateConverter implements IConverter<Instant> {
     this.formatter = DateTimeFormatter.ISO_DATE_TIME;
     this.timeZone = ZoneOffset.UTC;
     this.useCache = true;
+    this.pattern = null;
+    this.containsYear = true;
   }
 
-  private DateConverter(DateTimeFormatter formatter, ZoneId timeZone, boolean useCache) {
-    this.formatter = formatter;
+  private DateConverter(String pattern, ZoneId timeZone) {
+    this.formatter = DateTimeFormatter.ofPattern(pattern);
     this.timeZone = timeZone;
-    this.useCache = useCache;
+    this.useCache = !(pattern.contains("S") || pattern.contains("n") || pattern.contains("N") || pattern.contains("A"));
+    this.pattern = pattern;
+    var format = pattern.toLowerCase();
+    this.containsYear = format.contains("u") || format.contains("y");
   }
 
   @Override
@@ -139,6 +148,17 @@ class DateConverter implements IConverter<Instant> {
       if (ts != null) {
         return ts;
       }
+    }
+
+    var formatter = this.formatter;
+
+    if (!containsYear) {
+      LocalDate today = LocalDate.now(timeZone);
+      formatter = new DateTimeFormatterBuilder().append(this.formatter)
+              .parseDefaulting(ChronoField.YEAR, today.getYear())
+              .parseDefaulting(ChronoField.MONTH_OF_YEAR, today.getMonthValue())
+              .parseDefaulting(ChronoField.DAY_OF_MONTH, today.getDayOfMonth())
+              .toFormatter().withZone(timeZone);
     }
 
     TemporalAccessor dt = formatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
@@ -157,7 +177,6 @@ class DateConverter implements IConverter<Instant> {
   @Override
   public DateConverter newConverter(String param, Object... params) {
     Preconditions.checkArgument(params.length == 1 && params[0] instanceof ZoneId);
-    boolean useCache = !(param.contains("S") || param.contains("n") || param.contains("N") || param.contains("A"));
-    return new DateConverter(DateTimeFormatter.ofPattern(param), (ZoneId) params[0], useCache);
+    return new DateConverter(param, (ZoneId) params[0]);
   }
 }
