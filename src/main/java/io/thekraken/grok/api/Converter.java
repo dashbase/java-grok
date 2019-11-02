@@ -132,17 +132,13 @@ class DateConverter implements IConverter<Instant> {
     this.containsYear = true;
   }
 
-  private DateConverter(DateTimeFormatter formatter, String pattern, ZoneId timeZone, boolean useCache) {
-    this.formatter = formatter;
+  private DateConverter(String pattern, ZoneId timeZone) {
+    this.formatter = DateTimeFormatter.ofPattern(pattern);
     this.timeZone = timeZone;
-    this.useCache = useCache;
+    this.useCache = !(pattern.contains("S") || pattern.contains("n") || pattern.contains("N") || pattern.contains("A"));
     this.pattern = pattern;
-    if (pattern != null) {
-      var format = pattern.toLowerCase();
-      this.containsYear = format.contains("u") || format.contains("y");
-    } else {
-      this.containsYear = true;
-    }
+    var format = pattern.toLowerCase();
+    this.containsYear = format.contains("u") || format.contains("y");
   }
 
   @Override
@@ -181,7 +177,6 @@ class DateConverter implements IConverter<Instant> {
   @Override
   public DateConverter newConverter(String param, Object... params) {
     Preconditions.checkArgument(params.length == 1 && params[0] instanceof ZoneId);
-    boolean useCache = !(param.contains("S") || param.contains("n") || param.contains("N") || param.contains("A"));
-    return new DateConverter(DateTimeFormatter.ofPattern(param), param, (ZoneId) params[0], useCache);
+    return new DateConverter(param, (ZoneId) params[0]);
   }
 }
