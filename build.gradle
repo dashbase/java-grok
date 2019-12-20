@@ -34,7 +34,7 @@ sourceCompatibility = 10
 targetCompatibility = 10
 group = "io.dashbase"
 archivesBaseName = "grok"
-version = '0.2.3'
+version = '0.2.4'
 
 dependencies {
   compile "org.apache.commons:commons-lang3:3.7"
