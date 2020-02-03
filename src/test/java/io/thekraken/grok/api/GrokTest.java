@@ -568,6 +568,29 @@ public class GrokTest {
        assertEquals(8080, result.get("port").getValue());
        assertTrue(result.get("timestamp").getValue() instanceof Instant);
     }
+    
+    @Test
+    public void testDateStampSIPLog() throws Exception {
+    	
+    	Grok grok = compiler.compile("%{DATESTAMP_SIPLOG:timestamp:datetime:yyyy/MM/dd HH:mm:ss.SSSSSS} %{GREEDYDATA:message}", true);
+        Match match = grok.match("2020/02/03 03:55:38.791899 Host-MBP softwareupdated[376]: Removing client");
+        
+        assertTrue(match.capture().get("timestamp").getValue() instanceof Instant);
+        assertEquals(match.capture().get("message").getValue(),"Host-MBP softwareupdated[376]: Removing client");
+        
+        grok = compiler.compile("%{DATESTAMP_SIPLOG:timestamp:datetime:yyyy/MM/dd HH:mm:ss.SSS} %{GREEDYDATA:message}", true);
+        match = grok.match("2020/02/03 03:55:38.791 Host-MBP softwareupdated[376]: Removing client");
+        
+        assertTrue(match.capture().get("timestamp").getValue() instanceof Instant);
+        assertEquals(match.capture().get("message").getValue(),"Host-MBP softwareupdated[376]: Removing client");
+        
+
+        grok = compiler.compile("%{DATA:timestamp:datetime:yyyy/MM/dd HH:mm:ss.SSS} %{GREEDYDATA:message}", true);
+        match = grok.match("2020/02/03 03:55:38.791 Host-MBP softwareupdated[376]: Removing client");
+        
+        assertNotEquals(match.capture().get("message").getValue(),"Host-MBP softwareupdated[376]: Removing client");
+   	
+    }
 
     @Test
     public void testTimeZone() throws Exception {
