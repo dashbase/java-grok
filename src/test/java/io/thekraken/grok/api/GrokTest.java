@@ -635,6 +635,21 @@ public class GrokTest {
     }
 
     @Test
+    public void testRFC2822FormatPattern() throws Exception {
+        Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:EEE, dd MMM yy HH:mm:ss}\\]");
+        Match match = grok.match("[Sun, 30 Oct 16 17:16:09]");
+
+        ZonedDateTime today = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime zdt = ZonedDateTime.ofInstant((Instant) (match.capture().get("timestamp").getValue()), ZoneOffset.UTC);
+
+        assertEquals(10, zdt.getMonthValue());
+        assertEquals(30, zdt.getDayOfMonth());
+        assertEquals(17, zdt.getHour());
+        assertEquals(16, zdt.getMinute());
+        assertEquals(9, zdt.getSecond());
+    }
+
+    @Test
     public void testNoYearPattern() throws Exception {
         Grok grok = compiler.compile("\\[%{DATA:timestamp:datetime:MMM dd HH:mm:ss}\\]");
         Match match = grok.match("[Apr 06 16:16:50]");
