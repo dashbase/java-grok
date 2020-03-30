@@ -682,6 +682,35 @@ public class GrokTest {
     }
 
     @Test
+    public void testNonStandardDatetime() throws Exception {
+        Grok grok = compiler.compile("%{TIMESTAMP_ISO8601_NANO:timestamp:datetime}");
+        Match match = grok.match("2020-03-25T09:53:29.767.049Z");
+        ZonedDateTime zdt = ZonedDateTime.ofInstant((Instant) (match.capture().get("timestamp").getValue()), ZoneOffset.UTC);
+
+        assertEquals(2020, zdt.getYear());
+        assertEquals(3, zdt.getMonthValue());
+        assertEquals(25, zdt.getDayOfMonth());
+        assertEquals(9, zdt.getHour());
+        assertEquals(53, zdt.getMinute());
+        assertEquals(29, zdt.getSecond());
+        assertEquals(767000000, zdt.getNano());
+
+        assertEquals(ZonedDateTime.parse("2020-03-25T09:53:29.767Z", DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
+
+        grok = compiler.compile("TEST \\[%{TIMESTAMP_ISO8601_NANO:timestamp:datetime}\\]");
+        match = grok.match("TEST [2020-03-25T09:53:29.767.049Z]");
+        zdt = ZonedDateTime.ofInstant((Instant) (match.capture().get("timestamp").getValue()), ZoneOffset.UTC);
+
+        assertEquals(2020, zdt.getYear());
+        assertEquals(3, zdt.getMonthValue());
+        assertEquals(25, zdt.getDayOfMonth());
+        assertEquals(9, zdt.getHour());
+        assertEquals(53, zdt.getMinute());
+        assertEquals(29, zdt.getSecond());
+        assertEquals(767000000, zdt.getNano());
+    }
+
+    @Test
     public void testMultiline() throws Exception {
         Grok grok = compiler.compile("\\[%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss}\\] %{GREEDYDATA:message}");
         Match match = grok.match("[2019-04-06 16:16:50] test\nabc\nxyz");

@@ -61,6 +61,8 @@ public class Grok {
    */
   private final Pattern compiledNamedRegex;
 
+  private final boolean compiledNamedRegexContainsIgnore;
+
   /**
    * {@code Grok} patterns definition.
    */
@@ -88,6 +90,7 @@ public class Grok {
     this.originalGrokPattern = pattern;
     this.namedRegex = namedRegex;
     this.compiledNamedRegex = Pattern.compile(namedRegex, Pattern.DOTALL);
+    this.compiledNamedRegexContainsIgnore = namedRegex.contains("<ignore>");
     this.namedRegexCollection = namedRegexCollection;
     this.namedGroups = GrokUtils.getNameGroups(namedRegex);
     this.groupTypes = Converter.getGroupTypes(namedRegexCollection.values());
@@ -163,7 +166,7 @@ public class Grok {
     Matcher m = compiledNamedRegex.matcher(text);
     if (m.find()) {
       return new Match(
-          text, this, m, m.start(0), m.end(0)
+          text, this, m, m.start(0), m.end(0), compiledNamedRegexContainsIgnore
       );
     }
 

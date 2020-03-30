@@ -37,24 +37,26 @@ public class Match {
   private final Matcher match;
   private final int start;
   private final int end;
+  private final boolean containsIgnore;
 
   private Map<String, Entity> capture = Collections.emptyMap();
 
   /**
    * Create a new {@code Match} object.
    */
-  public Match(CharSequence subject, Grok grok, Matcher match, int start, int end) {
+  public Match(CharSequence subject, Grok grok, Matcher match, int start, int end, boolean containsIgnore) {
     this.subject = subject;
     this.grok = grok;
     this.match = match;
     this.start = start;
     this.end = end;
+    this.containsIgnore = containsIgnore;
   }
 
   /**
    * Create Empty grok matcher.
    */
-  public static final Match EMPTY = new Match("", null, null, 0, 0);
+  public static final Match EMPTY = new Match("", null, null, 0, 0, false);
 
   public Matcher getMatch() {
     return match;
@@ -137,7 +139,10 @@ public class Match {
         groupName = Converter.extractKey(groupName);
       }
 
-      var entity = new Entity(subject, start, end, converter);
+      Entity entity = new Entity(subject, start, end,
+          containsIgnore ? match.start("ignore") : -1,
+          containsIgnore ? match.end("ignore") : -1,
+          converter);
 
       Entity currentValue = capture.get(groupName);
 
