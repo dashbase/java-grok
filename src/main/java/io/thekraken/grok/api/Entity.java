@@ -9,13 +9,15 @@ public class Entity {
     private final CharSequence subject;
     public final int start;
     public final int end;
+    public final int ignoreStart;
+    public final int ignoreEnd;
     @Nullable
     private final IConverter converter;
 
     public List<Entity> additionalEntities = Collections.emptyList();
 
 
-    public Entity(CharSequence subject, int start, int end, IConverter converter) {
+    public Entity(CharSequence subject, int start, int end, int ignoreStart, int ignoreEnd, IConverter converter) {
         this.subject = subject;
 
         if (start != end) {
@@ -28,11 +30,18 @@ public class Entity {
         }
         this.start = start;
         this.end = end;
+        this.ignoreStart = ignoreStart;
+        this.ignoreEnd = ignoreEnd;
         this.converter = converter;
     }
 
     public Object getValue() {
-        var substring = subject.subSequence(start, end);
+        CharSequence substring;
+        if (ignoreStart >= start && ignoreEnd <= end) {
+            substring = subject.subSequence(start, ignoreStart).toString() + subject.subSequence(ignoreEnd, end);
+        } else {
+            substring = subject.subSequence(start, end);
+        }
         if (converter != null) {
             return converter.convert(substring);
         }
@@ -48,6 +57,6 @@ public class Entity {
 
     @Override
     public String toString() {
-        return getValue() + "[" + start + "," + end + "]";
+        return ignoreStart >= 0 ? getValue().toString() : getValue() + "[" + start + "," + end + "]";
     }
 }
