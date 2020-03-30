@@ -36,12 +36,10 @@ public class Entity {
     }
 
     public Object getValue() {
-        CharSequence substring;
-        if (ignoreStart >= start && ignoreEnd <= end) {
-            substring = subject.subSequence(start, ignoreStart).toString() + subject.subSequence(ignoreEnd, end);
-        } else {
-            substring = subject.subSequence(start, end);
-        }
+        CharSequence substring = ignoreStart >= start && ignoreEnd <= end
+            ? subject.subSequence(start, ignoreStart).toString() + subject.subSequence(ignoreEnd, end)
+            : subject.subSequence(start, end);
+
         if (converter != null) {
             return converter.convert(substring);
         }
