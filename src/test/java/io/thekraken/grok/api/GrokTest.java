@@ -683,9 +683,11 @@ public class GrokTest {
 
     @Test
     public void testNonStandardDatetime() throws Exception {
-        Grok grok = compiler.compile("%{TIMESTAMP_ISO8601_NANO:timestamp:datetime}");
+        Grok grok = compiler.compile("%{TIMESTAMP_ISO8601_NANO:timestamp:datetime}", true);
         Match match = grok.match("2020-03-25T09:53:29.767.049Z");
-        ZonedDateTime zdt = ZonedDateTime.ofInstant((Instant) (match.capture().get("timestamp").getValue()), ZoneOffset.UTC);
+        var capture = match.capture();
+        assertFalse(capture.containsKey("ignore"));
+        ZonedDateTime zdt = ZonedDateTime.ofInstant((Instant) (capture.get("timestamp").getValue()), ZoneOffset.UTC);
 
         assertEquals(2020, zdt.getYear());
         assertEquals(3, zdt.getMonthValue());

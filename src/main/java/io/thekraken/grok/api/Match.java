@@ -122,7 +122,7 @@ public class Match {
     this.grok.namedGroups.forEach(groupName -> {
       int start = match.start(groupName);
       int end = match.end(groupName);
-      if (start < 0) {
+      if (start < 0 || (containsIgnore && "ignore".equals(groupName))) {
         return;
       }
       String id = this.grok.getNamedRegexCollectionById(groupName);
