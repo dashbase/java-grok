@@ -720,4 +720,27 @@ public class GrokTest {
         assertEquals(ZonedDateTime.parse("2019-04-06 16:16:50", dtf.withZone(ZoneOffset.UTC)).toInstant(), match.capture().get("timestamp").getValue());
         assertEquals("test\nabc\nxyz", match.capture().get("message").getValue());
     }
+
+    @Test
+    public void testEpoch() throws Exception {
+        var grok = compiler.compile("%{NUMBER:timestamp:datetime:epoch}");
+
+        // epoch time in second
+        var match = grok.match("1595228400");
+        var capture = match.capture();
+        ZonedDateTime zdt = ZonedDateTime.ofInstant((Instant) (capture.get("timestamp").getValue()), ZoneOffset.UTC);
+        assertEquals("2020-07-20T07:00:00Z", DateTimeFormatter.ISO_DATE_TIME.format(zdt));
+
+        // epoch time in milli second
+        match = grok.match("1595228400000");
+        capture = match.capture();
+        zdt = ZonedDateTime.ofInstant((Instant) (capture.get("timestamp").getValue()), ZoneOffset.UTC);
+        assertEquals("2020-07-20T07:00:00Z", DateTimeFormatter.ISO_DATE_TIME.format(zdt));
+
+        // epoch time in second.nano
+        match = grok.match("1591117199.081700");
+        capture = match.capture();
+        zdt = ZonedDateTime.ofInstant((Instant) (capture.get("timestamp").getValue()), ZoneOffset.UTC);
+        assertEquals("2020-06-02T16:59:59.0000817Z", DateTimeFormatter.ISO_DATE_TIME.format(zdt));
+    }
 }
