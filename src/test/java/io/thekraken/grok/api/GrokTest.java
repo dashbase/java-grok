@@ -737,10 +737,16 @@ public class GrokTest {
         zdt = ZonedDateTime.ofInstant((Instant) (capture.get("timestamp").getValue()), ZoneOffset.UTC);
         assertEquals("2020-07-20T07:00:00Z", DateTimeFormatter.ISO_DATE_TIME.format(zdt));
 
-        // epoch time in second.nano
+        // epoch time in second.micro
         match = grok.match("1591117199.081700");
         capture = match.capture();
         zdt = ZonedDateTime.ofInstant((Instant) (capture.get("timestamp").getValue()), ZoneOffset.UTC);
-        assertEquals("2020-06-02T16:59:59.0000817Z", DateTimeFormatter.ISO_DATE_TIME.format(zdt));
+        assertEquals("2020-06-02T16:59:59.0817Z", DateTimeFormatter.ISO_DATE_TIME.format(zdt));
+
+        // epoch time in second.milli
+        match = grok.match("1591117199.081");
+        capture = match.capture();
+        zdt = ZonedDateTime.ofInstant((Instant) (capture.get("timestamp").getValue()), ZoneOffset.UTC);
+        assertEquals("2020-06-02T16:59:59.081Z", DateTimeFormatter.ISO_DATE_TIME.format(zdt));
     }
 }
