@@ -64,6 +64,9 @@ public class DateConverter implements IConverter<Instant> {
         }
         var epochSec = Long.parseLong(value, 0, indexOfDecimal, 10);
         var epochNano = Long.parseLong(value, indexOfDecimal + 1, value.length(), 10);
+        if (value.length() - indexOfDecimal < 10) {
+          epochNano *= Math.pow(10, 10 - value.length() + indexOfDecimal);
+        }
         return Instant.ofEpochSecond(epochSec, epochNano);
       }
     }
