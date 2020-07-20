@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
+import java.math.BigDecimal;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -58,15 +59,9 @@ public class DateConverter implements IConverter<Instant> {
         }
         return Instant.ofEpochSecond(epoch);
       } catch (NumberFormatException e) {
-        int indexOfDecimal = value.toString().indexOf('.');
-        if (indexOfDecimal < 0) {
-          throw new IllegalArgumentException(value + " cannot be parsed as epoch");
-        }
-        var epochSec = Long.parseLong(value, 0, indexOfDecimal, 10);
-        var epochNano = Long.parseLong(value, indexOfDecimal + 1, value.length(), 10);
-        if (value.length() - indexOfDecimal < 10) {
-          epochNano *= Math.pow(10, 10 - value.length() + indexOfDecimal);
-        }
+        var epoch = new BigDecimal(value.toString());
+        long epochSec = epoch.longValue();
+        long epochNano = epoch.movePointRight(9).longValue() - epochSec * 1000000000;
         return Instant.ofEpochSecond(epochSec, epochNano);
       }
     }
