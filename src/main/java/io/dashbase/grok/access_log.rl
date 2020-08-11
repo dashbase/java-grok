@@ -45,6 +45,18 @@ public class AccessLogParser {
             event.put("auth", new Entity(tok, p));
         }
 
+        action byte{
+            event.put("byte", new Entity(tok, p));
+        }
+
+        action response{
+            event.put("response", new Entity(tok, p));
+        }
+        action version{
+            event.put("version", new Entity(tok, p));
+        }
+
+
         action year {
             year = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
         }
@@ -101,13 +113,14 @@ public class AccessLogParser {
         IDENT= STRING_DATA > tok %ident;
 
         AUTH= STRING_DATA > tok %auth;
-        HTTP_VERSION = (NIL | "HTTP/" [0-9.]+) >tok;
-        RESPONSE = (NIL | digit+) >tok;
-        BYTE = (NIL | digit+) >tok;
+        HTTP_VERSION = (NIL | "HTTP/" [0-9.]+) >tok %version;
+        RESPONSE = (NIL | digit+) >tok %response;
+        BYTE = (NIL | digit+) >tok %byte;
 
-        MESSAGE = any* > tok %message;
+        MESSAGE = (any - " ")* > tok %message;
 
-        main := IP SP IDENT SP AUTH SP HTTP_DATE SP
+
+        main := IP SP IDENT SP AUTH SP "[" FULL_DATE ":" FULL_TIME"]" SP
                 DB_QUOTE VERB SP MESSAGE SP HTTP_VERSION DB_QUOTE
                 SP RESPONSE SP DB_QUOTE BYTE DB_QUOTE;
 

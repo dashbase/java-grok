@@ -24,7 +24,7 @@ public class AccessLogParser {
 
 
     
-// line 114 "src/main/java/io/dashbase/grok/access_log.rl"
+// line 127 "src/main/java/io/dashbase/grok/access_log.rl"
 
 
     
@@ -34,7 +34,7 @@ private static byte[] init__accessLog_actions_0()
 	return new byte [] {
 	    0,    1,    0,    1,    1,    1,    2,    1,    3,    1,    4,    1,
 	    5,    1,    6,    1,    7,    1,    8,    1,    9,    1,   10,    1,
-	   11,    1,   12,    2,    0,    1
+	   11,    1,   12,    1,   13,    1,   14,    1,   15,    2,    0,    1
 	};
 }
 
@@ -47,9 +47,9 @@ private static short[] init__accessLog_key_offsets_0()
 	    0,    0,    3,    7,    8,   16,   25,   26,   27,   35,   44,   45,
 	   46,   49,   51,   52,   56,   61,   63,   65,   67,   69,   70,   73,
 	   75,   76,   78,   80,   81,   83,   85,   87,   90,   94,   97,  101,
-	  104,  105,  106,  110,  115,  116,  117,  120,  122,  123,  128,  130,
-	  134,  138,  140,  144,  146,  148,  150,  152,  156,  161,  164,  166,
-	  168,  169,  171,  174,  177,  180,  183,  186,  187,  189,  191
+	  104,  105,  106,  110,  115,  116,  117,  119,  120,  121,  124,  125,
+	  126,  129,  130,  133,  136,  137,  138,  139,  140,  143,  147,  149,
+	  151,  152,  154,  157,  160,  163,  166,  169,  170,  172,  174
 	};
 }
 
@@ -68,14 +68,12 @@ private static char[] init__accessLog_trans_keys_0()
 	   49,   48,   57,   58,   48,   53,   48,   57,   58,   48,   53,   48,
 	   57,   32,   46,   43,   45,   90,   48,   53,   54,   57,   93,   48,
 	   57,   58,   93,   48,   57,   93,   48,   57,   32,   34,   65,   90,
-	   97,  122,   32,   65,   90,   97,  122,   32,   32,   32,   45,   72,
-	   32,   34,   32,   32,   45,   72,   48,   57,   32,   34,   32,   34,
-	   45,   72,   32,   45,   48,   57,   32,   34,   32,   34,   48,   57,
-	   32,   84,   32,   84,   32,   80,   32,   47,   32,   46,   48,   57,
-	   32,   34,   46,   48,   57,   32,   48,   57,   48,   53,   48,   57,
-	   93,   48,   57,   32,   48,   57,   32,   48,   57,   32,   48,   57,
-	   32,   48,   57,   32,   48,   57,   32,   48,   51,   48,   49,   32,
-	    0
+	   97,  122,   32,   65,   90,   97,  122,   32,   32,   45,   72,   34,
+	   32,   45,   48,   57,   32,   34,   45,   48,   57,   34,   34,   48,
+	   57,   32,   48,   57,   84,   84,   80,   47,   46,   48,   57,   34,
+	   46,   48,   57,   48,   53,   48,   57,   93,   48,   57,   32,   48,
+	   57,   32,   48,   57,   32,   48,   57,   32,   48,   57,   32,   48,
+	   57,   32,   48,   51,   48,   49,    0
 	};
 }
 
@@ -88,9 +86,9 @@ private static byte[] init__accessLog_single_lengths_0()
 	    0,    1,    2,    1,    0,    1,    1,    1,    0,    1,    1,    1,
 	    1,    0,    1,    0,    1,    0,    0,    0,    0,    1,    1,    0,
 	    1,    0,    0,    1,    0,    0,    2,    3,    0,    1,    2,    1,
-	    1,    1,    0,    1,    1,    1,    3,    2,    1,    3,    2,    4,
-	    2,    2,    2,    2,    2,    2,    2,    2,    3,    1,    0,    0,
-	    1,    0,    1,    1,    1,    1,    1,    1,    0,    0,    1
+	    1,    1,    0,    1,    1,    1,    2,    1,    1,    1,    1,    1,
+	    1,    1,    1,    1,    1,    1,    1,    1,    1,    2,    0,    0,
+	    1,    0,    1,    1,    1,    1,    1,    1,    0,    0,    0
 	};
 }
 
@@ -104,7 +102,7 @@ private static byte[] init__accessLog_range_lengths_0()
 	    1,    1,    0,    2,    2,    1,    1,    1,    1,    0,    1,    1,
 	    0,    1,    1,    0,    1,    1,    0,    0,    2,    1,    1,    1,
 	    0,    0,    2,    2,    0,    0,    0,    0,    0,    1,    0,    0,
-	    1,    0,    1,    0,    0,    0,    0,    1,    1,    1,    1,    1,
+	    1,    0,    1,    1,    0,    0,    0,    0,    1,    1,    1,    1,
 	    0,    1,    1,    1,    1,    1,    1,    0,    1,    1,    0
 	};
 }
@@ -118,9 +116,9 @@ private static short[] init__accessLog_index_offsets_0()
 	    0,    0,    3,    7,    9,   14,   20,   22,   24,   29,   35,   37,
 	   39,   42,   44,   46,   49,   53,   55,   57,   59,   61,   63,   66,
 	   68,   70,   72,   74,   76,   78,   80,   83,   87,   90,   93,   97,
-	  100,  102,  104,  107,  111,  113,  115,  119,  122,  124,  129,  132,
-	  137,  141,  144,  148,  151,  154,  157,  160,  164,  169,  172,  174,
-	  176,  178,  180,  183,  186,  189,  192,  195,  197,  199,  201
+	  100,  102,  104,  107,  111,  113,  115,  118,  120,  122,  125,  127,
+	  129,  132,  134,  137,  140,  142,  144,  146,  148,  151,  155,  157,
+	  159,  161,  163,  166,  169,  172,  175,  178,  180,  182,  184
 	};
 }
 
@@ -139,14 +137,13 @@ private static byte[] init__accessLog_indicies_0()
 	   30,    1,   31,    1,   32,    1,   33,    1,   34,   35,    1,   36,
 	   36,   37,    1,   38,   39,    1,   41,   40,    1,   42,   41,   39,
 	    1,   41,   39,    1,   43,    1,   44,    1,   45,   45,    1,   46,
-	   47,   47,    1,   49,   48,   51,   50,   51,   52,   53,   50,   51,
-	   54,   50,   55,   50,   51,   56,   53,   57,   50,   58,   54,   50,
-	   51,   59,   52,   53,   50,   51,   60,   61,   50,   51,   62,   50,
-	   51,   62,   63,   50,   51,   64,   50,   51,   65,   50,   51,   66,
-	   50,   51,   67,   50,   51,   68,   68,   50,   51,   54,   68,   68,
-	   50,   58,   69,   50,   70,    1,   37,    1,   41,    1,   71,    1,
-	   72,   73,    1,   72,   74,    1,   72,   75,    1,   72,   76,    1,
-	   72,   77,    1,   72,    1,   27,    1,   15,    1,   51,   50,    0
+	   47,   47,    1,   49,   48,   51,   50,   52,   53,    1,   54,    1,
+	   55,    1,   56,   57,    1,   58,    1,   59,    1,   60,   61,    1,
+	   62,    1,   62,   63,    1,   58,   64,    1,   65,    1,   66,    1,
+	   67,    1,   68,    1,   69,   69,    1,   54,   69,   69,    1,   70,
+	    1,   37,    1,   41,    1,   71,    1,   72,   73,    1,   72,   74,
+	    1,   72,   75,    1,   72,   76,    1,   72,   77,    1,   72,    1,
+	   27,    1,   15,    1,    1,    0
 	};
 }
 
@@ -160,8 +157,8 @@ private static byte[] init__accessLog_trans_targs_0()
 	   12,   13,   69,   14,   15,   16,   17,   16,   18,   19,   20,   21,
 	   22,   23,   68,   24,   25,   26,   27,   28,   29,   30,   31,   61,
 	   32,   60,   33,   35,   34,   36,   58,   37,   38,   39,   40,   39,
-	   41,   42,   41,   42,   43,   51,   44,   45,   46,   57,   47,   48,
-	   49,   50,   70,   50,   52,   53,   54,   55,   56,   57,   59,   62,
+	   41,   42,   41,   42,   43,   52,   44,   45,   46,   51,   47,   48,
+	   49,   50,   70,   50,   51,   53,   54,   55,   56,   57,   59,   62,
 	   31,   63,   64,   65,   66,   67
 	};
 }
@@ -173,12 +170,12 @@ private static byte[] init__accessLog_trans_actions_0()
 {
 	return new byte [] {
 	    1,    0,    7,    0,    1,    0,    0,    9,    1,    0,    0,   11,
-	    0,    1,    1,    0,   17,    1,   15,    0,    1,    0,    0,    0,
-	   13,    1,    1,    0,   19,    1,    0,   21,    1,    0,   23,   23,
+	    0,    1,    1,    0,   23,    1,   21,    0,    1,    0,    0,    0,
+	   19,    1,    1,    0,   25,    1,    0,   27,    1,    0,   29,   29,
 	    1,    0,    0,    0,    0,    0,    0,    0,    0,    1,    5,    0,
-	    1,   27,    0,    3,    1,    1,    0,    3,    1,    1,    3,    0,
-	    1,    1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,
-	   25,    0,    0,    0,    0,    0
+	    1,   33,    0,    3,    1,    1,   17,    0,    1,    1,   15,    0,
+	    1,    1,   13,    0,    0,    0,    0,    0,    0,    0,    0,    1,
+	   31,    0,    0,    0,    0,    0
 	};
 }
 
@@ -192,7 +189,7 @@ static final int accessLog_error = 0;
 static final int accessLog_en_main = 1;
 
 
-// line 117 "src/main/java/io/dashbase/grok/access_log.rl"
+// line 130 "src/main/java/io/dashbase/grok/access_log.rl"
 
 
 
@@ -217,15 +214,15 @@ static final int accessLog_en_main = 1;
         var tok = 0;
 
         
-// line 221 "src/main/java/io/dashbase/grok/AccessLogParser.java"
+// line 218 "src/main/java/io/dashbase/grok/AccessLogParser.java"
 	{
 	cs = accessLog_start;
 	}
 
-// line 141 "src/main/java/io/dashbase/grok/access_log.rl"
+// line 154 "src/main/java/io/dashbase/grok/access_log.rl"
 
         
-// line 229 "src/main/java/io/dashbase/grok/AccessLogParser.java"
+// line 226 "src/main/java/io/dashbase/grok/AccessLogParser.java"
 	{
 	int _klen;
 	int _trans = 0;
@@ -344,46 +341,64 @@ case 1:
 	case 6:
 // line 48 "src/main/java/io/dashbase/grok/access_log.rl"
 	{
-            year = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
+            event.put("byte", new Entity(tok, p));
         }
 	break;
 	case 7:
 // line 52 "src/main/java/io/dashbase/grok/access_log.rl"
 	{
-            month = parseMothStr(String.valueOf(Arrays.copyOfRange(data, tok, p)));
+            event.put("response", new Entity(tok, p));
         }
 	break;
 	case 8:
 // line 55 "src/main/java/io/dashbase/grok/access_log.rl"
 	{
-            day = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
+            event.put("version", new Entity(tok, p));
         }
 	break;
 	case 9:
-// line 59 "src/main/java/io/dashbase/grok/access_log.rl"
+// line 60 "src/main/java/io/dashbase/grok/access_log.rl"
 	{
-            hour = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
+            year = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
         }
 	break;
 	case 10:
-// line 63 "src/main/java/io/dashbase/grok/access_log.rl"
+// line 64 "src/main/java/io/dashbase/grok/access_log.rl"
 	{
-            minute = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
+            month = parseMothStr(String.valueOf(Arrays.copyOfRange(data, tok, p)));
         }
 	break;
 	case 11:
 // line 67 "src/main/java/io/dashbase/grok/access_log.rl"
 	{
-            second = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
+            day = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
         }
 	break;
 	case 12:
-// line 70 "src/main/java/io/dashbase/grok/access_log.rl"
+// line 71 "src/main/java/io/dashbase/grok/access_log.rl"
+	{
+            hour = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
+        }
+	break;
+	case 13:
+// line 75 "src/main/java/io/dashbase/grok/access_log.rl"
+	{
+            minute = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
+        }
+	break;
+	case 14:
+// line 79 "src/main/java/io/dashbase/grok/access_log.rl"
+	{
+            second = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
+        }
+	break;
+	case 15:
+// line 82 "src/main/java/io/dashbase/grok/access_log.rl"
 	{
             nano = Integer.parseInt(String.valueOf(Arrays.copyOfRange(data, tok, p)));
         }
 	break;
-// line 387 "src/main/java/io/dashbase/grok/AccessLogParser.java"
+// line 402 "src/main/java/io/dashbase/grok/AccessLogParser.java"
 			}
 		}
 	}
@@ -403,7 +418,7 @@ case 5:
 	break; }
 	}
 
-// line 143 "src/main/java/io/dashbase/grok/access_log.rl"
+// line 156 "src/main/java/io/dashbase/grok/access_log.rl"
 
         var date = LocalDateTime.of(year, month, day, hour,second, minute,nano);
 
