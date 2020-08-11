@@ -15,6 +15,7 @@ public class FreeSwitchParser {
     %%{
 
         machine freeswitch;
+        include common "common.rl";
 
         action uuid {
             event.uuid = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
@@ -41,7 +42,6 @@ public class FreeSwitchParser {
         }
 
 
-        include common "common.rl";
 
         UUID                = [0-9a-zA-Z\-]+ >tok %uuid;
 
@@ -52,7 +52,7 @@ public class FreeSwitchParser {
         LEVEL               = '[' LEVEL_NAME ']' ;
 
         SOURCE_FILE         = CHAR+ > tok %source_file;
-        SOURCE_LINE         =  digit+ > tok %source_line;
+        SOURCE_LINE         = digit+ > tok %source_line;
         SOURCE              = SOURCE_FILE ":" SOURCE_LINE;
 
 

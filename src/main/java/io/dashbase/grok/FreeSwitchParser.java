@@ -24,7 +24,7 @@ private static byte[] init__freeswitch_actions_0()
 {
 	return new byte [] {
 	    0,    1,    0,    1,    1,    1,    2,    1,    3,    1,    4,    1,
-	    5,    1,    6,    2,    6,    5
+	    5,    1,    6,    2,    0,    6
 	};
 }
 
@@ -123,8 +123,8 @@ private static final byte _freeswitch_trans_targs[] = init__freeswitch_trans_tar
 private static byte[] init__freeswitch_trans_actions_0()
 {
 	return new byte [] {
-	   13,    0,    1,    0,   13,    0,    0,    0,    5,    0,   13,    0,
-	    3,    0,   13,    0,    7,   13,    9,    0,   13,    0
+	    1,    0,    3,    0,    1,    0,    0,    0,    7,    0,    1,    0,
+	    5,    0,    1,    0,    9,    1,   11,    0,    1,    0
 	};
 }
 
@@ -135,7 +135,7 @@ private static byte[] init__freeswitch_eof_actions_0()
 {
 	return new byte [] {
 	    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-	    0,    0,    0,   15,   11
+	    0,    0,    0,   15,   13
 	};
 }
 
@@ -253,40 +253,40 @@ case 1:
 			switch ( _freeswitch_actions[_acts++] )
 			{
 	case 0:
-// line 19 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
-	{
-            event.uuid = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
-        }
-	break;
-	case 1:
-// line 23 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
-	{
-            event.level = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
-        }
-	break;
-	case 2:
-// line 27 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
-	{
-            event.time = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
-        }
-	break;
-	case 3:
-// line 31 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
-	{
-            event.source_file = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
-        }
-	break;
-	case 4:
-// line 35 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
-	{
-            event.source_line = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
-        }
-	break;
-	case 6:
 // line 4 "src/main/java/io/dashbase/grok/common.rl"
 	{
     tok = p;
   }
+	break;
+	case 1:
+// line 20 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
+	{
+            event.uuid = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
+        }
+	break;
+	case 2:
+// line 24 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
+	{
+            event.level = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
+        }
+	break;
+	case 3:
+// line 28 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
+	{
+            event.time = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
+        }
+	break;
+	case 4:
+// line 32 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
+	{
+            event.source_file = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
+        }
+	break;
+	case 5:
+// line 36 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
+	{
+            event.source_line = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
+        }
 	break;
 // line 292 "src/main/java/io/dashbase/grok/FreeSwitchParser.java"
 			}
@@ -309,17 +309,17 @@ case 4:
 	int __nacts = (int) _freeswitch_actions[__acts++];
 	while ( __nacts-- > 0 ) {
 		switch ( _freeswitch_actions[__acts++] ) {
-	case 5:
-// line 39 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
-	{
-            event.message = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
-        }
-	break;
-	case 6:
+	case 0:
 // line 4 "src/main/java/io/dashbase/grok/common.rl"
 	{
     tok = p;
   }
+	break;
+	case 6:
+// line 40 "src/main/java/io/dashbase/grok/freeswitch_parser.rl"
+	{
+            event.message = String.valueOf(Arrays.copyOfRange(data, tok, p)) ;
+        }
 	break;
 // line 325 "src/main/java/io/dashbase/grok/FreeSwitchParser.java"
 		}
