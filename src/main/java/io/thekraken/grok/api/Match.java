@@ -18,6 +18,8 @@ package io.thekraken.grok.api;
 
 import com.google.common.collect.Maps;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -116,9 +118,6 @@ public class Match {
 
     capture = Maps.newHashMap();
 
-    // _capture.put("LINE", this.line);
-    // _capture.put("LENGTH", this.line.length() +"");
-
     this.grok.namedGroups.forEach(groupName -> {
       int start = match.start(groupName);
       int end = match.end(groupName);
@@ -160,6 +159,26 @@ public class Match {
         capture.put(groupName, entity);
       }
     });
+
+    // if DATETIME_DELTA field exists, update the value of DATETIME field, and remove the DATETIME_DELTA field.
+    grok.getFieldNameOf(Converter.Type.DATETIME).ifPresent(timestampField -> {
+      grok.getFieldNameOf(Converter.Type.DATETIME_DELTA).ifPresent(deltaField -> {
+        Duration delta = (Duration) capture.remove(deltaField).getValue();
+        Entity timestamp = capture.get(timestampField);
+        var instant = (Instant) timestamp.getValue();
+        capture.put(timestampField, timestamp.withCustomValue(instant.plus(delta)));
+      });
+    });
+
+    this.grok.groupTypes.entrySet().stream()
+        .filter(e -> e.getValue() == Converter.Type.DATETIME_DELTA)
+        .map(e -> e.getKey())
+        .findFirst()
+        .ifPresent(deltaFieldName -> {
+          var delta = capture.get(deltaFieldName);
+
+        });
+
 
 
     capture = Collections.unmodifiableMap(capture);

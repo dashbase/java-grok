@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -748,5 +749,16 @@ public class GrokTest {
         capture = match.capture();
         zdt = ZonedDateTime.ofInstant((Instant) (capture.get("timestamp").getValue()), ZoneOffset.UTC);
         assertEquals("2020-06-02T16:59:59.081Z", DateTimeFormatter.ISO_DATE_TIME.format(zdt));
+    }
+
+    @Test
+    public void testDateTimeDelta() throws Exception {
+        var grok = compiler.compile("Tsec:%{NUMBER:timestamp:datetime:epoch},Tmsec:%{NUMBER:timestamp_delta:datetime_delta}");
+
+        var match = grok.match("Tsec:1596726855,Tmsec:541834");
+        var capture = match.capture();
+        var timestamp = capture.get("timestamp");
+        assertEquals(1596726855541L, ((Instant) timestamp.getValue()).toEpochMilli());
+        assertFalse(capture.containsKey("timestamp_delta"));
     }
 }
