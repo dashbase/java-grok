@@ -170,17 +170,6 @@ public class Match {
       });
     });
 
-    this.grok.groupTypes.entrySet().stream()
-        .filter(e -> e.getValue() == Converter.Type.DATETIME_DELTA)
-        .map(e -> e.getKey())
-        .findFirst()
-        .ifPresent(deltaFieldName -> {
-          var delta = capture.get(deltaFieldName);
-
-        });
-
-
-
     capture = Collections.unmodifiableMap(capture);
 
     return capture;
