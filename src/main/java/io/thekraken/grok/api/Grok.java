@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZoneId;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -186,5 +187,9 @@ public class Grok {
       disco = new Discovery(this);
     }
     return disco.discover(input);
+  }
+
+  public Optional<String> getFieldNameOf(Converter.Type type) {
+    return groupTypes.entrySet().stream().filter(e -> e.getValue() == type).map(e -> e.getKey()).findFirst();
   }
 }

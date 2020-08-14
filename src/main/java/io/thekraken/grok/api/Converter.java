@@ -37,7 +37,8 @@ public class Converter {
     META(v -> v, "sorted"),
 
     // Dashbase specific type
-    ID(v -> v, "key");
+    ID(v -> v, "key"),
+    DATETIME_DELTA(new DateTimeDeltaConverter(), "date_delta");
 
     public final IConverter<?> converter;
     public final List<String> aliases;

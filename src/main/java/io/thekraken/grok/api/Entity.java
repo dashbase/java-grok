@@ -53,6 +53,15 @@ public class Entity {
         additionalEntities.add(entity);
     }
 
+    public Entity withCustomValue(Object customValue) {
+        return new Entity(subject, start, end, ignoreStart, ignoreEnd, converter) {
+            @Override
+            public Object getValue() {
+                return customValue;
+            }
+        };
+    }
+
     @Override
     public String toString() {
         return ignoreStart >= 0 ? getValue().toString() : getValue() + "[" + start + "," + end + "]";
