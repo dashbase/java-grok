@@ -75,6 +75,7 @@ public class Converter {
   public static Map<String, IConverter> getConverters(Collection<String> groupNames, Object... params) {
     return groupNames.stream()
         .filter(group -> Converter.DELIMITER.matchesAnyOf(group))
+        .distinct()
         .collect(Collectors.toMap(Function.identity(), key -> {
           List<String> list = SPLITTER.splitToList(key);
           IConverter converter = getType(list.get(1)).converter;
@@ -88,6 +89,7 @@ public class Converter {
   public static Map<String, Type> getGroupTypes(Collection<String> groupNames) {
     return groupNames.stream()
         .filter(group -> Converter.DELIMITER.matchesAnyOf(group))
+        .distinct()
         .map(group -> SPLITTER.splitToList(group))
         .collect(Collectors.toMap(
             l -> l.get(0),
