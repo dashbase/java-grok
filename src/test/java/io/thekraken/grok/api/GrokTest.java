@@ -761,4 +761,19 @@ public class GrokTest {
         assertEquals(1596726855541L, ((Instant) timestamp.getValue()).toEpochMilli());
         assertFalse(capture.containsKey("timestamp_delta"));
     }
+
+    @Test
+    public void testDuplicatePatternName() throws Exception {
+        var grok = compiler.compile("(?:%{NUMBER:src:int} %{NUMBER:dst:int} apple|%{NUMBER:dst:int} %{NUMBER:src:int} orange)");
+
+        var match = grok.match("123 456 apple");
+        var capture = match.capture();
+        assertEquals(123, capture.get("src").getValue());
+        assertEquals(456, capture.get("dst").getValue());
+
+        match = grok.match("123 456 orange");
+        capture = match.capture();
+        assertEquals(123, capture.get("dst").getValue());
+        assertEquals(456, capture.get("src").getValue());
+    }
 }
